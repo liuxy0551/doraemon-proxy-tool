@@ -27,7 +27,7 @@ pnpm repack
 
 ### 或者直接下载打包好的扩展程序
 
--   [Releases](https://github.com/JackWang032/doraemon-proxy-tool/releases)
+-   [Releases](https://github.com/liuxy0551/doraemon-proxy-tool/releases)
 
 &nbsp;&nbsp;
 地址栏输入 chrome://extensions/ 进入扩展页面，点击加载已解压的扩展程序(需先开启右上角的开发者模式)，选择刚解压出的文件夹。

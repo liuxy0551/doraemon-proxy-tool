@@ -100,7 +100,7 @@ const Options: React.FC<IProps> = () => {
                         type="link"
                         onClick={() =>
                             window.open(
-                                'https://github.com/JackWang032/doraemon-proxy-tool',
+                                'https://github.com/liuxy0551/doraemon-proxy-tool',
                                 '_blank'
                             )
                         }

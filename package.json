@@ -5,7 +5,7 @@
     "description": "A chrome extension that help you to proxy quickly",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/JackWang032/doraemon-proxy-tool.git"
+        "url": "git+https://github.com/liuxy0551/doraemon-proxy-tool.git"
     },
     "keywords": [
         "doraemon",
@@ -73,7 +73,7 @@
         "webpack-dev-server": "^4.7.4"
     },
     "bugs": {
-        "url": "https://github.com/JackWang032/doraemon-proxy-tool/issues"
+        "url": "https://github.com/liuxy0551/doraemon-proxy-tool/issues"
     },
-    "homepage": "https://github.com/JackWang032/doraemon-proxy-tool#readme"
+    "homepage": "https://github.com/liuxy0551/doraemon-proxy-tool#readme"
 }
