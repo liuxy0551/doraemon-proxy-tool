@@ -1,0 +1,31 @@
+src/pages/Content/devops-login.js
+  s_a5af598d94009e::t_fc95e1f803adae 339-340,343-344,348-351
+  s_a5af598d94009e::t_b449ed598eb713 352
+  s_a5af598d94009e::t_1520f756a09b40 345-347
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 324
+  s_a5af598d94009e::t_e193d0555d0763 244,307
+src/pages/Background/index.ts
+  s_a5af598d94009e::t_85b28431f61fb5 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0ad37b7f323bf5cb75ef61f9ed3458d0fd86bb7d",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_a5af598d94009e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6ddd-c652-7390-95f9-be88e4ec9da5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
