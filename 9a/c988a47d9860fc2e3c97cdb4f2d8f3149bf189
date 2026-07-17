@@ -1,0 +1,20 @@
+README.md
+  h_0c940a947252a6 30
+package.json
+  h_0c940a947252a6 8,76,78
+CHANGELOG.md
+  h_0c940a947252a6 5,10,12,17-18,20,24,28,30,34-36,40
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9ac988a47d9860fc2e3c97cdb4f2d8f3149bf189",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
