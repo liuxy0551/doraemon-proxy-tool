@@ -1,0 +1,41 @@
+src/pages/Content/index.js
+  s_a5af598d94009e::t_777fdcf3fbf49c 73,75,78-103
+  s_a5af598d94009e::t_2b6f139d53fee3 74,104
+  s_a5af598d94009e::t_ae2f3655499b18 76-77
+src/pages/Background/index.ts
+  s_a5af598d94009e::t_3c7818cce4d8cf 165
+  s_a5af598d94009e::t_5af71e843089ec 95,101-112,115-124,209,213-224
+  s_a5af598d94009e::t_9e5e3f8df8ed4e 96-100
+  s_a5af598d94009e::t_d01e6457025e7c 113-114
+src/typings/index.d.ts
+  s_a5af598d94009e::t_dc7e6b497f063d 43
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 338,344
+  s_a5af598d94009e::t_c1e38c6aa54a19 254,333-337,339-343
+src/pages/Content/devops-login.js
+  s_a5af598d94009e::t_784a4dd79dacc1 189-193,198,211-213,215,249,301,323,366-367,382
+  s_a5af598d94009e::t_5ba5fcc0292025 126-145,147-156,169-171,173-174,182-183,185,187-188,194-197,199-210,216-221,230-242,247-248,253,268,304,313-314,316-317,327,362,372
+  s_a5af598d94009e::t_efe6ed1b6fdc46 168,172,175-181,184,186,222-223
+  s_a5af598d94009e::t_fd9a265b1e119f 146,157-167,214,224-229,243-246,254-255,270,315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "952972640adf6de8298ce53f6714c3114d8578d6",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_a5af598d94009e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6ddd-c652-7390-95f9-be88e4ec9da5",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
