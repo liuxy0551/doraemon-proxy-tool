@@ -55,6 +55,11 @@
 
     async function waitPageDidMount() {
         return new Promise((resolve) => {
+            if (document.querySelector('.c-login__container__form__btn')) {
+                resolve(true);
+                return;
+            }
+
             const observer = new MutationObserver((mutationList, observer) => {
                 for (const mutation of mutationList) {
                     if (
@@ -66,11 +71,15 @@
                     }
                 }
             });
-            observer.observe(document.querySelector('#app'), {
-                attributes: false,
-                childList: true,
-                subtree: true,
-            });
+            // 刷新时脚本可能早于 #app 挂载，先监听根节点避免 observe(null) 直接失败
+            observer.observe(
+                document.querySelector('#app') || document.documentElement,
+                {
+                    attributes: false,
+                    childList: true,
+                    subtree: true,
+                }
+            );
         });
     }
 
@@ -150,7 +159,7 @@
             .then((res) => {
                 if (!res.success) {
                     showToast(
-                        '快速登录失败, 请检查账号密码或者验证码是否关闭，错误信息：' +
+                        '快速登录失败, 请检查用户名、密码、验证码，错误信息：' +
                             res.message
                     );
                     return;

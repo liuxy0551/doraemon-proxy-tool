@@ -125,7 +125,7 @@ export const initStorage: IStorageCache = {
         theme: 'auto', // light, dark, auto
         devopsInjectEnabled: true, // 是否开启devops开发环境代码注入
         matchUrls:
-            '(.devops.dtstack.cn$)|(^([a-zA-Z0-9]+.)?[0-9]+x.dtstack.cn$)', // 代码注入匹配规则
+            '(.dtstack.cn$)', // 代码注入匹配规则
         quickLogin: {
             enabled: true,
             username: '',

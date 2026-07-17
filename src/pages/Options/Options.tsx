@@ -230,7 +230,7 @@ const Options: React.FC<IProps> = () => {
                             </Form.Item>
                         </div>
                         <div className="option-item">
-                            <div className="option-title">集成</div>
+                            <div className="option-title">集成登录</div>
                             <Form.Item
                                 name="matchUrls"
                                 label="注入匹配地址"
@@ -303,14 +303,14 @@ const Options: React.FC<IProps> = () => {
                                                     'quickLogin',
                                                     'jumpProductPath',
                                                 ]}
-                                                label="登录成功后跳转地址"
+                                                label="登录后跳转地址"
                                                 initialValue={
                                                     config.quickLogin
                                                         ?.jumpProductPath
                                                 }
                                             >
                                                 <Input
-                                                    placeholder="请输入登录成功后跳转地址"
+                                                    placeholder="请输入登录后跳转地址"
                                                     style={{ width: 316 }}
                                                 />
                                             </Form.Item>

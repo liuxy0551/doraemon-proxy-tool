@@ -1,12 +1,17 @@
 chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, allEnvList }) {
+    function isSameHostname(urlStr) {
+        if (!urlStr) return false;
+        try {
+            return new URL(urlStr).hostname === location.hostname;
+        } catch (error) {
+            return false;
+        }
+    }
+
     if (
         (!config?.matchUrls ||
             !new RegExp(config?.matchUrls).test(location.hostname)) &&
-        !allEnvList?.some((env) => {
-            if (!env.url) return false;
-            const url = new URL(env.url);
-            return url.hostname === location.hostname;
-        })
+        !allEnvList?.some((env) => isSameHostname(env.url))
     )
         return false;
 
@@ -24,7 +29,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         const devopsEnvRegex = /base(\d+)\.devops\.dtstack\.cn/;
 
         // devops环境考虑存在低版本，其他环境默认都为60以上版本
-        if (devopsEnvRegex.test(devopsEnvRegex)) {
+        if (devopsEnvRegex.test(hostname)) {
             const match = hostname.match(devopsEnvRegex);
             const version = match && match[1];
             if (!version) return false;
@@ -50,10 +55,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
             ...config.quickLogin,
         }
 
-        const envInfo = allEnvList.find(env => {
-            const url = new URL (env.url);
-            return url.hostname === location.hostname;
-        });
+        const envInfo = allEnvList.find(env => isSameHostname(env.url));
 
         // 优先取env配置
         if (envInfo && envInfo.uicUsername) {
