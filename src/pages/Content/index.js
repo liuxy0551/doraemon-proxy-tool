@@ -70,6 +70,38 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         loginScript.addEventListener('openOptionPage', () => {
             chrome.runtime.sendMessage({ action: 'openOptionPage' });
         });
+        loginScript.addEventListener('recognizeCaptcha', async () => {
+            const request = JSON.parse(loginScript.dataset.ocrRequest || '{}');
+            try {
+                const image = request.image;
+                if (!image) throw new Error('未读取到验证码图片');
+                chrome.runtime.sendMessage(
+                    {
+                        action: 'recognizeCaptcha',
+                        ocrApiUrl: loginConfig.ocrApiUrl,
+                        image,
+                    },
+                    (response) => {
+                        const errorMessage = chrome.runtime.lastError?.message;
+                        loginScript.dataset.ocrResponse = JSON.stringify({
+                            requestId: request.requestId,
+                            ...(response || {
+                                success: false,
+                                message: errorMessage || 'OCR请求失败',
+                            }),
+                        });
+                        loginScript.dispatchEvent(new CustomEvent('captchaRecognized'));
+                    }
+                );
+            } catch (error) {
+                loginScript.dataset.ocrResponse = JSON.stringify({
+                    requestId: request.requestId,
+                    success: false,
+                    message: error?.message || '验证码图片读取失败',
+                });
+                loginScript.dispatchEvent(new CustomEvent('captchaRecognized'));
+            }
+        });
         document.documentElement.appendChild(loginScript);
     }
 });

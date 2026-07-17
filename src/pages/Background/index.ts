@@ -92,6 +92,36 @@ const handleContextMenuClick = async (info, tab?: chrome.tabs.Tab) => {
     }
 };
 
+const recognizeCaptcha = async (ocrApiUrl: string, image: string) => {
+    if (!ocrApiUrl) {
+        throw new Error('未配置OCR接口地址');
+    }
+
+    const ocrUrl = new URL('/ocr', ocrApiUrl);
+    const res = await fetch(ocrUrl.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            image,
+            probability: false,
+        }),
+    });
+
+    if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        throw new Error(`OCR接口请求失败: ${res.status} ${body}`);
+    }
+
+    const data = await res.json();
+    const result = String(data?.result || '').trim();
+    if (!result) {
+        throw new Error('OCR接口未返回识别结果');
+    }
+    return result;
+};
+
 const registerContectMenus = () => {
     chrome.contextMenus.create({
         id: 'devops',
@@ -132,6 +162,7 @@ export const initStorage: IStorageCache = {
             password: '',
             jumpProductPath: '/portal',
             defaultTenantId: '1',
+            ocrApiUrl: 'http://172.16.100.225:8000',
         },
     },
     // 记录用户上次操作的状态
@@ -175,8 +206,20 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
 
-chrome.runtime.onMessage.addListener((request) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (request.action === 'openOptionPage') {
         chrome.runtime.openOptionsPage();
+    }
+
+    if (request.action === 'recognizeCaptcha') {
+        recognizeCaptcha(request.ocrApiUrl, request.image)
+            .then((result) => sendResponse({ success: true, result }))
+            .catch((error) => {
+                sendResponse({
+                    success: false,
+                    message: error?.message || 'OCR识别失败',
+                });
+            });
+        return true;
     }
 });

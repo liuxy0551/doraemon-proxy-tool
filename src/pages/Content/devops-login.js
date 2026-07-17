@@ -123,10 +123,136 @@
         inputElement.dispatchEvent(inputEvent);
     }
 
-    async function execQuickLogin(username, password, jumpUrl, tenantId) {
+    function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function getCaptchaInput() {
+        const selectors = [
+            '#verify_code',
+            '#verifyCode',
+            '#captcha',
+            'input[name="verify_code"]',
+            'input[name="verifyCode"]',
+            'input[name="captcha"]',
+            'input[placeholder*="验证码"]',
+            'input[placeholder*="校验码"]',
+        ];
+        return document.querySelector(selectors.join(','));
+    }
+
+    function getCaptchaImage() {
+        const selectors = [
+            '#v_code',
+            'img[src*="verify"]',
+            'img[src*="captcha"]',
+            'img[src*="code"]',
+            'img[alt*="验证码"]',
+            '.c-login__container__form img',
+            'form img',
+        ];
+        return document.querySelector(selectors.join(','));
+    }
+
+    function getCaptchaKey(imageElement) {
+        const src = imageElement?.currentSrc || imageElement?.src;
+        if (!src) return '';
+
+        try {
+            return new URL(src, window.location.origin).searchParams.get('key') || '';
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function getCaptchaImageBase64(imageElement) {
+        const src = imageElement?.currentSrc || imageElement?.src;
+        if (!src) throw new Error('未找到验证码图片地址');
+        if (src.startsWith('data:')) {
+            return src.includes(',') ? src.split(',')[1] : src;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = imageElement.naturalWidth || imageElement.width;
+        canvas.height = imageElement.naturalHeight || imageElement.height;
+        const context = canvas.getContext('2d');
+        context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/png');
+        return dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+    }
+
+    function requestCaptchaOcr(image) {
+        const requestId = `${Date.now()}-${Math.random()}`;
+        script.dataset.ocrRequest = JSON.stringify({ requestId, image });
+
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                script.removeEventListener('captchaRecognized', handleResponse);
+                reject(new Error('OCR接口请求超时'));
+            }, 10000);
+
+            const handleResponse = () => {
+                const response = JSON.parse(script.dataset.ocrResponse || '{}');
+                if (response.requestId !== requestId) return;
+
+                clearTimeout(timer);
+                script.removeEventListener('captchaRecognized', handleResponse);
+                if (response.success) {
+                    resolve(String(response.result || '').replace(/\s/g, ''));
+                } else {
+                    reject(new Error(response.message || 'OCR识别失败'));
+                }
+            };
+
+            script.addEventListener('captchaRecognized', handleResponse);
+            script.dispatchEvent(new CustomEvent('recognizeCaptcha'));
+        });
+    }
+
+    async function recognizeCaptchaCode(ocrApiUrl) {
+        if (!String(ocrApiUrl || '').trim()) {
+            return { code: '1', key: '' };
+        }
+
+        let lastError;
+        const imageElement = getCaptchaImage();
+
+        for (let retryCount = 0; retryCount <= 2; retryCount++) {
+            try {
+                const image = getCaptchaImageBase64(imageElement);
+                const code = await requestCaptchaOcr(image);
+                if (code) {
+                    return {
+                        code,
+                        key: getCaptchaKey(imageElement),
+                    };
+                }
+                throw new Error('OCR识别结果为空');
+            } catch (error) {
+                lastError = error;
+                // 识别失败后点击验证码刷新，再重试两次
+                if (retryCount < 2) {
+                    imageElement?.click();
+                    await sleep(500);
+                }
+            }
+        }
+
+        console.log('验证码识别失败，使用兜底验证码', lastError);
+        showToast('验证码识别失败，已使用兜底值 1');
+        return {
+            code: '1',
+            key: getCaptchaKey(imageElement),
+        };
+    }
+
+    async function execQuickLogin(username, password, jumpUrl, tenantId, ocrApiUrl) {
         const loginBtnText = document.querySelector(
             '#doraemon-login-btn .doraemon-text'
         );
+        loginBtnText.innerText = '识别中...';
+        const { code: verifyCode, key: captchaKey } =
+            await recognizeCaptchaCode(ocrApiUrl);
         loginBtnText.innerText = '登录中...';
         const publicKey = await getPulicKey().catch(() => {
             loginBtnText.innerText = '快速登录';
@@ -139,8 +265,9 @@
         const params = {
             username,
             password: encryptPwd,
-            verify_code: '0000',
+            verify_code: verifyCode,
         };
+        if (captchaKey) params.key = captchaKey;
         if (tenantId) params.tenantId = tenantId;
         const formData = new URLSearchParams();
         Object.keys(params).forEach((key) => {
@@ -171,9 +298,10 @@
             });
     }
 
-    function typePassword(username, password) {
+    async function typePassword(username, password, ocrApiUrl) {
         var usernameInput = document.querySelector('#username');
         var passwordInput = document.querySelector('#password');
+        var captchaInput = getCaptchaInput();
 
         if (!usernameInput || !passwordInput) {
             showToast('输入失败, 未找到账号或密码输入框');
@@ -182,16 +310,21 @@
 
         simulate(usernameInput, username);
         simulate(passwordInput, password);
+
+        if (captchaInput) {
+            const { code } = await recognizeCaptchaCode(ocrApiUrl);
+            simulate(captchaInput, code);
+        }
     }
 
     try {
         const { quickLogin } = script.dataset;
         const loginConfig = JSON.parse(quickLogin || '{}');
-        const { username, password, jumpProductPath, defaultTenantId } =
+        const { username, password, jumpProductPath, defaultTenantId, ocrApiUrl } =
             loginConfig;
 
         var loginBtn = createLoginButton();
-        loginBtn.addEventListener('click', function () {
+        loginBtn.addEventListener('click', async function () {
             if (!username || !password) {
                 showToast(
                     '未配置账号或密码，即将为您打开扩展选项页进行配置...',
@@ -226,16 +359,17 @@
                     ? decodeURIComponent(urlParams.insightRedirectUrl)
                     : configUrl.toString();
 
-            execQuickLogin(
+            await execQuickLogin(
                 username,
                 password,
                 jumpUrl,
-                urlParams.tenantId ?? defaultTenantId
+                urlParams.tenantId ?? defaultTenantId,
+                ocrApiUrl
             );
         });
 
         var typingBtn = createTypingButton();
-        typingBtn.addEventListener('click', function () {
+        typingBtn.addEventListener('click', async function () {
             if (!username || !password) {
                 showToast(
                     '未配置账号或密码，即将为您打开扩展选项页进行配置...',
@@ -245,7 +379,7 @@
                 );
                 return;
             }
-            typePassword(username, password);
+            await typePassword(username, password, ocrApiUrl);
         });
 
         await waitPageDidMount();

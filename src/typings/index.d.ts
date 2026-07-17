@@ -40,6 +40,7 @@ interface IConfig {
         password: string;
         jumpProductPath: string;
         defaultTenantId: string;
+        ocrApiUrl: string;
     };
 }
 

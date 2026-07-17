@@ -251,7 +251,7 @@ const Options: React.FC<IProps> = () => {
                             <Form.Item
                                 name={['quickLogin', 'enabled']}
                                 label="快速登录"
-                                tooltip="优先会取环境配置中的账号密码，请保证环境中的验证码校验已关闭"
+                                tooltip="优先会取环境配置中的账号密码，验证码会调用 OCR 接口识别"
                                 initialValue={config.quickLogin?.enabled}
                                 valuePropName="checked"
                             >
@@ -327,6 +327,21 @@ const Options: React.FC<IProps> = () => {
                                             >
                                                 <Input
                                                     placeholder="请输入默认进入的租户id"
+                                                    style={{ width: 316 }}
+                                                />
+                                            </Form.Item>
+                                            <Form.Item
+                                                name={[
+                                                    'quickLogin',
+                                                    'ocrApiUrl',
+                                                ]}
+                                                label="验证码OCR接口地址"
+                                                initialValue={
+                                                    config.quickLogin?.ocrApiUrl
+                                                }
+                                            >
+                                                <Input
+                                                    placeholder="请输入验证码 OCR 接口地址"
                                                     style={{ width: 316 }}
                                                 />
                                             </Form.Item>
