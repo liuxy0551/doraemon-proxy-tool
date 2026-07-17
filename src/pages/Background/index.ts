@@ -160,7 +160,7 @@ export const initStorage: IStorageCache = {
             enabled: true,
             username: '',
             password: '',
-            jumpProductPath: '/portal',
+            jumpProductPath: '',
             defaultTenantId: '1',
             ocrApiUrl: 'http://172.16.100.225:8000',
         },

@@ -241,7 +241,7 @@ const Options: React.FC<IProps> = () => {
                             </Form.Item>
                             <Form.Item
                                 name="devopsInjectEnabled"
-                                label="devops注入(前端专用)"
+                                label="devops/OMP注入(前端专用)"
                                 tooltip="开启后会重写本地开发环境（域名dev.或local.开头）的config文件，接管跳转地址至线上环境"
                                 initialValue={config.devopsInjectEnabled}
                                 valuePropName="checked"
@@ -304,6 +304,7 @@ const Options: React.FC<IProps> = () => {
                                                     'jumpProductPath',
                                                 ]}
                                                 label="登录后跳转地址"
+                                                tooltip="相对地址，如：/batch"
                                                 initialValue={
                                                     config.quickLogin
                                                         ?.jumpProductPath
@@ -320,6 +321,7 @@ const Options: React.FC<IProps> = () => {
                                                     'defaultTenantId',
                                                 ]}
                                                 label="默认进入租户id"
+                                                tooltip="DT_demo 租户id 为 1"
                                                 initialValue={
                                                     config.quickLogin
                                                         ?.defaultTenantId

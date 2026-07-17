@@ -336,10 +336,20 @@
             }
 
             const configUrl = new URL(window.PARAMCONFIG?.DEFAULT_JUMP_PATH);
-            configUrl.pathname = !defaultTenantId
+            const hasCustomJumpProductPath = Boolean(jumpProductPath);
+            const productPath = !defaultTenantId
                 ? '/publicService'
                 : jumpProductPath;
-            configUrl.hash = '';
+            // 设置页为空时保留 DEFAULT_JUMP_PATH，避免把 /console/#/portal 改成 /console/#
+            if (!defaultTenantId || hasCustomJumpProductPath) {
+                // 只有显式配置 hash 路由时才写 hash，/batch 这类产品路径应该跳到站点根路径
+                if (productPath.startsWith('#')) {
+                    configUrl.hash = productPath;
+                } else {
+                    configUrl.pathname = productPath;
+                    configUrl.hash = '';
+                }
+            }
 
             const urlParams = getUrlParams();
             let insightRedirectUrl = '';
