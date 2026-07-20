@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.6.0...v1.7.0) (2026-07-20)
+
+
+### Features
+
+* support captcha OCR recognition for quick login ([9529726](https://github.com/liuxy0551/doraemon-proxy-tool/commit/952972640adf6de8298ce53f6714c3114d8578d6))
+
+
+### Bug Fixes
+
+* improve quick login release build ([b42fb95](https://github.com/liuxy0551/doraemon-proxy-tool/commit/b42fb958de9105ca0c892653b5678cedbbada221))
+* update quick login redirect defaults ([0ad37b7](https://github.com/liuxy0551/doraemon-proxy-tool/commit/0ad37b7f323bf5cb75ef61f9ed3458d0fd86bb7d))
+* update setting trigger element ([708bb4e](https://github.com/liuxy0551/doraemon-proxy-tool/commit/708bb4e4e2fd67d9b9d739dce87b32ae5dab9794))
+
 ## [1.6.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.5.0...v1.6.0) (2024-12-26)
 
 
