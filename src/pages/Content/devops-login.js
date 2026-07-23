@@ -269,7 +269,14 @@
         };
     }
 
-    async function execQuickLogin(username, password, jumpUrl, tenantId, ocrApiUrl) {
+    async function execQuickLogin(
+        username,
+        password,
+        jumpUrl,
+        tenantId,
+        ocrApiUrl,
+        captchaExpiredRetryCount = 0
+    ) {
         const loginBtnText = document.querySelector(
             '#doraemon-login-btn .doraemon-text'
         );
@@ -296,7 +303,7 @@
         Object.keys(params).forEach((key) => {
             formData.append(key, params[key]);
         });
-        fetch('/uic/api/v2/account/login', {
+        return fetch('/uic/api/v2/account/login', {
             method: 'POST',
             headers: {
                 'X-Custom-Header': 'dtuic',
@@ -306,7 +313,34 @@
             body: formData.toString(),
         })
             .then((response) => response.json())
-            .then((res) => {
+            .then(async (res) => {
+                const isCaptchaExpired =
+                    res.code === 0 &&
+                    String(res.message || '').includes('验证码已过期');
+                const captchaImage = isCaptchaExpired
+                    ? getCaptchaImage()
+                    : null;
+
+                // 验证码过期时刷新并重新登录一次，避免持续过期导致无限重试
+                if (
+                    !res.success &&
+                    isCaptchaExpired &&
+                    captchaExpiredRetryCount < 1 &&
+                    captchaImage
+                ) {
+                    loginBtnText.innerText = '刷新验证码...';
+                    captchaImage.click();
+                    await sleep(500);
+                    return execQuickLogin(
+                        username,
+                        password,
+                        jumpUrl,
+                        tenantId,
+                        ocrApiUrl,
+                        captchaExpiredRetryCount + 1
+                    );
+                }
+
                 if (!res.success) {
                     showToast(
                         '快速登录失败, 请检查用户名、密码、验证码，错误信息：' +
