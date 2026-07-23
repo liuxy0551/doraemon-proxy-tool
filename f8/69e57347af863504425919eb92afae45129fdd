@@ -1,0 +1,63 @@
+src/pages/Content/index.js
+  s_1af8d0f1ffb424::t_57ba219611a6fb 1
+  s_a5af598d94009e::t_f5cde3677fcf38 2,14
+src/pages/Content/devops.js
+  h_0c940a947252a6 12
+  s_a5af598d94009e::t_cd2ee347ab0650 11,13
+src/pages/Background/index.ts
+  s_1af8d0f1ffb424::t_ce18e0fe9d87a9 3
+  s_4391c96c5130ff::t_d1a5f068f18e72 167
+  s_1af8d0f1ffb424::t_170dc3f96aa415 62-63
+  s_a5af598d94009e::t_70d2e7e5515448 60
+  s_4391c96c5130ff::t_513714b7febecb 162
+  s_1af8d0f1ffb424::t_3e7d7025282b4e 61
+src/utils/hostMatcher.js
+  s_1af8d0f1ffb424::t_51dc11ecc4b2cf 1-8,10,20-21,23-24,28-40
+  s_6d010aaa4926da::t_21d9a62ff27af8 9
+  s_6d010aaa4926da::t_bbb44855fccf72 11-19,22,25-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f869e57347af863504425919eb92afae45129fdd",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_1af8d0f1ffb424": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1ed5f5e0-8518-4152-8fd3-03703d8b83bf",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_4391c96c5130ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a8f42fe-b33f-4611-a41e-a95539029ae8",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_6d010aaa4926da": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f8ee3-5afe-7d01-8b70-11adb8872848",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_a5af598d94009e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6ddd-c652-7390-95f9-be88e4ec9da5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
