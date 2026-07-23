@@ -1,5 +1,6 @@
 import api from '@/api';
 import { POPUP_SIZE_TYPE, POPUP_TAB } from '@/const';
+import { isMatchedHost, isIpAddress } from '@/utils/hostMatcher';
 
 const getLocalIp = async () => {
     const res = await api.getLocalIp();
@@ -56,7 +57,10 @@ const getDevopsUrl = async (urlStr?: string) => {
     } = (await chrome.storage.local.get('config')) || {};
     const url = new URL(urlStr);
 
-    if (!matchUrls || !new RegExp(matchUrls).test(url.hostname)) return '';
+    if (!isMatchedHost(matchUrls, url.hostname)) return '';
+
+    // IP 地址不支持 devops 翻转（dev. 前缀对 IP 无效）
+    if (isIpAddress(url.hostname)) return '';
 
     if (
         ['dev', 'local'].some((prefix) => url.hostname.startsWith(prefix)) ||
@@ -155,12 +159,12 @@ export const initStorage: IStorageCache = {
         theme: 'auto', // light, dark, auto
         devopsInjectEnabled: true, // 是否开启devops开发环境代码注入
         matchUrls:
-            '(.dtstack.cn$)', // 代码注入匹配规则
+            '(.dtstack.cn$|172\\.16\\.)', // 代码注入匹配规则
         quickLogin: {
             enabled: true,
             username: '',
             password: '',
-            jumpProductPath: '',
+            jumpProductPath: '/portal',
             defaultTenantId: '1',
             ocrApiUrl: 'http://172.16.100.225:8000',
         },

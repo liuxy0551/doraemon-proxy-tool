@@ -8,7 +8,9 @@
     // 是否是devops开发环境
     function getIsDev(url) {
         return (
-            DEV_PREFIXS.some((prefix) => url.hostname.startsWith(prefix))
+            DEV_PREFIXS.some((prefix) => url.hostname.startsWith(prefix)) ||
+            // 172.16 网段地址为内网地址，不带 dev/local 前缀
+            /^172\.16\./.test(url.hostname)
         );
     }
 

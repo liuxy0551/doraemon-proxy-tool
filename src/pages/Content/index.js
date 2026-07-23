@@ -1,3 +1,5 @@
+import { isMatchedHost } from '@/utils/hostMatcher';
+
 chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, allEnvList }) {
     function isSameHostname(urlStr) {
         if (!urlStr) return false;
@@ -9,8 +11,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
     }
 
     if (
-        (!config?.matchUrls ||
-            !new RegExp(config?.matchUrls).test(location.hostname)) &&
+        !isMatchedHost(config?.matchUrls, location.hostname) &&
         !allEnvList?.some((env) => isSameHostname(env.url))
     )
         return false;
