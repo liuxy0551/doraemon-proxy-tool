@@ -34,6 +34,29 @@
         return aGET;
     }
 
+    function getDefaultJumpUrl(defaultJumpPath) {
+        const fallbackUrl = new URL('/portal', window.location.origin);
+        const defaultJumpPathText = String(defaultJumpPath || '').trim();
+        if (!defaultJumpPathText) return fallbackUrl;
+
+        // DEFAULT_JUMP_PATH 出现 http:/console 这类少一个斜杠的协议写法时直接判无效
+        if (/^https?:\/(?!\/)/i.test(defaultJumpPathText)) return fallbackUrl;
+
+        try {
+            const defaultJumpUrl = new URL(
+                defaultJumpPathText,
+                window.location.origin
+            );
+            // 只允许当前站点内跳转，避免 console/publicService 被错误解析成 host
+            if (defaultJumpUrl.origin !== window.location.origin) {
+                return fallbackUrl;
+            }
+            return defaultJumpUrl;
+        } catch (error) {
+            return fallbackUrl;
+        }
+    }
+
     async function getPulicKey() {
         if (sessionStorage.getItem('publicKey')) {
             return Promise.resolve(sessionStorage.getItem('publicKey'));
@@ -335,7 +358,9 @@
                 return;
             }
 
-            const configUrl = new URL(window.PARAMCONFIG?.DEFAULT_JUMP_PATH);
+            const configUrl = getDefaultJumpUrl(
+                window.PARAMCONFIG?.DEFAULT_JUMP_PATH
+            );
             const hasCustomJumpProductPath = Boolean(jumpProductPath);
             const productPath = !defaultTenantId
                 ? '/publicService'
