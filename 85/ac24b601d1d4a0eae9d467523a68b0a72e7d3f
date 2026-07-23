@@ -1,0 +1,24 @@
+src/pages/Content/devops-login.js
+  s_6eeafa840f50b7::t_e04ade998a3c17 37-59,361-363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "85ac24b601d1d4a0eae9d467523a68b0a72e7d3f",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_6eeafa840f50b7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f8ec8-d15d-7843-b750-04749a710c78",
+        "model": "gpt-5.5"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
