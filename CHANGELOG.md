@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.7.0...v1.7.1) (2026-07-27)
+
+
+### Features
+
+* add configurable auto-trigger for quick login ([6fea8f3](https://github.com/liuxy0551/doraemon-proxy-tool/commit/6fea8f33a23c70c5871e84fe94c3105acd405fc6))
+
+
+### Bug Fixes
+
+* retry quick login on captcha expiration ([cac0995](https://github.com/liuxy0551/doraemon-proxy-tool/commit/cac0995066e9824e5c6ad1004012001d68ec0706))
+* safely parse default jump URL in login ([85ac24b](https://github.com/liuxy0551/doraemon-proxy-tool/commit/85ac24b601d1d4a0eae9d467523a68b0a72e7d3f))
+
 ## [1.7.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.6.0...v1.7.0) (2026-07-20)
 
 
