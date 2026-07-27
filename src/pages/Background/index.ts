@@ -162,6 +162,8 @@ export const initStorage: IStorageCache = {
             '(.dtstack.cn$|172\\.16\\.)', // 代码注入匹配规则
         quickLogin: {
             enabled: true,
+            autoTrigger: true,
+            autoTriggerDelay: 3,
             username: '',
             password: '',
             jumpProductPath: '/portal',

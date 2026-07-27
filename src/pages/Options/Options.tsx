@@ -270,6 +270,58 @@ const Options: React.FC<IProps> = () => {
                                             <Form.Item
                                                 name={[
                                                     'quickLogin',
+                                                    'autoTrigger',
+                                                ]}
+                                                label="自动触发快速登录"
+                                                tooltip="进入登录页面后自动触发快速登录"
+                                                initialValue={
+                                                    config.quickLogin
+                                                        ?.autoTrigger !== false
+                                                }
+                                                valuePropName="checked"
+                                            >
+                                                <Switch />
+                                            </Form.Item>
+                                            <Form.Item
+                                                noStyle
+                                                dependencies={[
+                                                    ['quickLogin', 'autoTrigger'],
+                                                ]}
+                                            >
+                                                {() =>
+                                                    form.getFieldValue([
+                                                        'quickLogin',
+                                                        'autoTrigger',
+                                                    ]) && (
+                                                        <Form.Item
+                                                            name={[
+                                                                'quickLogin',
+                                                                'autoTriggerDelay',
+                                                            ]}
+                                                            label="触发延迟(秒)"
+                                                            tooltip="进入登录页面后延迟多少秒自动触发"
+                                                            initialValue={
+                                                                config.quickLogin
+                                                                    ?.autoTriggerDelay ??
+                                                                3
+                                                            }
+                                                        >
+                                                            <InputNumber
+                                                                min={1}
+                                                                max={60}
+                                                                precision={0}
+                                                                style={{
+                                                                    width: 120,
+                                                                }}
+                                                                addonAfter="秒"
+                                                            />
+                                                        </Form.Item>
+                                                    )
+                                                }
+                                            </Form.Item>
+                                            <Form.Item
+                                                name={[
+                                                    'quickLogin',
                                                     'username',
                                                 ]}
                                                 label="登录账号"

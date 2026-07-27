@@ -377,11 +377,17 @@
     try {
         const { quickLogin } = script.dataset;
         const loginConfig = JSON.parse(quickLogin || '{}');
-        const { username, password, jumpProductPath, defaultTenantId, ocrApiUrl } =
+        const { username, password, jumpProductPath, defaultTenantId, ocrApiUrl, autoTrigger, autoTriggerDelay } =
             loginConfig;
 
         var loginBtn = createLoginButton();
+        var autoTriggerTimer = null;
         loginBtn.addEventListener('click', async function () {
+            // 手动点击时取消自动触发
+            if (autoTriggerTimer) {
+                clearTimeout(autoTriggerTimer);
+                autoTriggerTimer = null;
+            }
             if (!username || !password) {
                 showToast(
                     '未配置账号或密码，即将为您打开扩展选项页进行配置...',
@@ -454,6 +460,18 @@
         await waitPageDidMount();
         document.body.appendChild(loginBtn);
         document.body.appendChild(typingBtn);
+
+        // 进入登录页面后延迟自动触发快速登录
+        if (String(autoTrigger) !== 'false') {
+            const delay = (Number(autoTriggerDelay ?? 3)) * 1000;
+            autoTriggerTimer = setTimeout(() => {
+                autoTriggerTimer = null;
+                showToast('即将自动触发快速登录...');
+                setTimeout(() => {
+                    loginBtn.click();
+                }, 1500);
+            }, delay);
+        }
     } catch (error) {
         console.log('注入失败', error);
     }

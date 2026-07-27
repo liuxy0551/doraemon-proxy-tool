@@ -36,6 +36,8 @@ interface IConfig {
     matchUrls: string;
     quickLogin: {
         enabled: boolean;
+        autoTrigger: boolean;
+        autoTriggerDelay: number;
         username: string;
         password: string;
         jumpProductPath: string;
