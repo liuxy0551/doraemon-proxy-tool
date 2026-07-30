@@ -314,17 +314,19 @@
         })
             .then((response) => response.json())
             .then(async (res) => {
-                const isCaptchaExpired =
+                const message = String(res.message || '');
+                // 判断是否为验证码相关错误（过期、错误、不正确等）
+                const isCaptchaError =
                     res.code === 0 &&
-                    String(res.message || '').includes('验证码已过期');
-                const captchaImage = isCaptchaExpired
+                    /验证码.*(过期|错误|不正确|失效|失败)|captcha.*(expired|error|invalid)/i.test(message);
+                const captchaImage = isCaptchaError
                     ? getCaptchaImage()
                     : null;
 
-                // 验证码过期时刷新并重新登录一次，避免持续过期导致无限重试
+                // 验证码错误时刷新并重新登录一次，避免持续错误导致无限重试
                 if (
                     !res.success &&
-                    isCaptchaExpired &&
+                    isCaptchaError &&
                     captchaExpiredRetryCount < 1 &&
                     captchaImage
                 ) {
