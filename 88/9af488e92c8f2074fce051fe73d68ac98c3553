@@ -1,0 +1,22 @@
+src/pages/Content/devops.js
+  s_bc3414be220f89::t_cf00fd69a0c471 22
+  s_bc3414be220f89::t_fe86de311dba27 6
+  s_bc3414be220f89::t_d14a042ceb3892 64
+  s_bc3414be220f89::t_848db558f652fa 19-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "889af488e92c8f2074fce051fe73d68ac98c3553",
+  "prompts": {},
+  "sessions": {
+    "s_bc3414be220f89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "068033d6-2c00-4f41-a2f5-c6c625cfa6f3",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
