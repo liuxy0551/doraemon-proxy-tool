@@ -1,0 +1,19 @@
+src/pages/Content/devops-login.js
+  s_140c528b10fe22::t_112096bb8ee14a 317-319,321-322,326,329
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3219837891c1f44d294ce601b10a39f4f42df797",
+  "prompts": {},
+  "sessions": {
+    "s_140c528b10fe22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7939c903-8333-4c48-9841-4047f039399d",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
