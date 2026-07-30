@@ -3,7 +3,7 @@
 (function () {
     const CONFIG_PATH = 'public/config/config.js';
     const DEV_PREFIXS = ['dev.', 'local.'];
-    const { hostname, pathname, protocol } = window.location;
+    const { host, pathname, protocol } = window.location;
 
     // 是否是devops开发环境
     function getIsDev(url) {
@@ -16,10 +16,10 @@
 
     if (!getIsDev(window.location)) return;
 
-    // rewrite config.js
-    const onlineEnvHostname = hostname.replace(/^(dev\.|local\.)/, '');
+    // rewrite config.js - 使用 host 保留端口
+    const onlineEnvHost = host.replace(/^(dev\.|local\.)/, '');
     const onlineUrl =
-        protocol + '//' + onlineEnvHostname + pathname + CONFIG_PATH;
+        protocol + '//' + onlineEnvHost + pathname + CONFIG_PATH;
     var configScript = document.createElement('script');
     configScript.src = onlineUrl;
     configScript.onload = function () {
@@ -61,7 +61,7 @@
             const rewriteAddr =
                 url.protocol +
                 '//' +
-                onlineEnvHostname +
+                onlineEnvHost +
                 url.pathname +
                 url.hash +
                 url.search;
