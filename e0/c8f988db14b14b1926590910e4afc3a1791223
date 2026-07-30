@@ -1,0 +1,32 @@
+src/pages/Content/devops-login.js
+  s_140c528b10fe22::t_112096bb8ee14a 317-319,321-322,326,329
+src/pages/Content/devops.js
+  s_bc3414be220f89::t_848db558f652fa 19-20
+  s_bc3414be220f89::t_cf00fd69a0c471 22
+  s_bc3414be220f89::t_fe86de311dba27 6
+  s_bc3414be220f89::t_d14a042ceb3892 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e0c8f988db14b14b1926590910e4afc3a1791223",
+  "prompts": {},
+  "sessions": {
+    "s_140c528b10fe22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7939c903-8333-4c48-9841-4047f039399d",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_bc3414be220f89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "068033d6-2c00-4f41-a2f5-c6c625cfa6f3",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
