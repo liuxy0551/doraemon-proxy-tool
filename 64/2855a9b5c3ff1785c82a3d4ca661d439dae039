@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-07-30-auto-trigger-cancellation-design.md
+  s_1d3a3a870d91f0::t_1970e083524f6d 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "642855a9b5c3ff1785c82a3d4ca661d439dae039",
+  "prompts": {},
+  "sessions": {
+    "s_1d3a3a870d91f0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb2a0-0aa0-7850-9be4-94c85b6e6540",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
