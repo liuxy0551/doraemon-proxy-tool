@@ -1,0 +1,21 @@
+src/pages/Content/devops-login.js
+  s_1d3a3a870d91f0::t_8f7366624fc5e4 2-136,157-158,291,312-315,451-454,512-520,523-524,527,603-612,614-626
+test/devops-login-auto-trigger.test.js
+  s_1d3a3a870d91f0::t_e91916d6005a9a 1-306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "2deb13530b0dba2d47b40dd575d95531d0172819",
+  "prompts": {},
+  "sessions": {
+    "s_1d3a3a870d91f0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb2a0-0aa0-7850-9be4-94c85b6e6540",
+        "model": "unknown"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
