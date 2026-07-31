@@ -1,4 +1,139 @@
 (async function () {
+    const CAPTCHA_INPUT_SELECTOR = [
+        '#verify_code',
+        '#verifyCode',
+        '#captcha',
+        'input[name="verify_code"]',
+        'input[name="verifyCode"]',
+        'input[name="captcha"]',
+        'input[placeholder*="验证码"]',
+        'input[placeholder*="校验码"]',
+    ].join(',');
+    const LOGIN_INPUT_SELECTOR = [
+        '#username',
+        '#password',
+        CAPTCHA_INPUT_SELECTOR,
+    ].join(',');
+
+    function createAutoTriggerController({
+        delay,
+        countdownDelay,
+        onCountdown,
+        onTrigger,
+        onCancel,
+        setTimer = setTimeout,
+        clearTimer = clearTimeout,
+    }) {
+        let delayTimer = null;
+        let countdownTimer = null;
+        let pending = false;
+
+        function clearPendingTimers() {
+            if (delayTimer !== null) clearTimer(delayTimer);
+            if (countdownTimer !== null) clearTimer(countdownTimer);
+            delayTimer = null;
+            countdownTimer = null;
+        }
+
+        return {
+            schedule() {
+                if (pending) return false;
+
+                pending = true;
+                delayTimer = setTimer(() => {
+                    delayTimer = null;
+                    if (!pending) return;
+
+                    onCountdown();
+                    countdownTimer = setTimer(() => {
+                        countdownTimer = null;
+                        if (!pending) return;
+
+                        pending = false;
+                        onTrigger();
+                    }, countdownDelay);
+                }, delay);
+                return true;
+            },
+            cancel() {
+                if (!pending) return false;
+
+                pending = false;
+                clearPendingTimers();
+                onCancel();
+                return true;
+            },
+            isPending() {
+                return pending;
+            },
+        };
+    }
+
+    function shouldCancelAutoTrigger(event, captchaImage) {
+        if (event.type === 'keydown') return event.key === 'Escape';
+        if (event.type === 'input') {
+            return Boolean(event.target?.matches?.(LOGIN_INPUT_SELECTOR));
+        }
+        if (event.type !== 'click') return false;
+        if (event.target === captchaImage) return true;
+
+        return Boolean(
+            event.target?.closest?.(
+                '.c-login__container__form__btn, #doraemon-typing-btn'
+            )
+        );
+    }
+
+    function updateAutoTriggerCancellationToast(countdownToast) {
+        if (!countdownToast) return false;
+        countdownToast.innerText = '已取消本次自动登录';
+        return true;
+    }
+
+    function bindAutoTriggerCancellation({
+        eventTarget,
+        controller,
+        getCaptchaImage,
+    }) {
+        function handleUserTakeover(event) {
+            // 只响应明确的登录操作，页面空白区域和无关输入不取消自动触发
+            if (!shouldCancelAutoTrigger(event, getCaptchaImage())) return;
+            controller.cancel();
+        }
+
+        const eventTypes = ['keydown', 'input', 'click'];
+        eventTypes.forEach((eventType) => {
+            eventTarget.addEventListener(eventType, handleUserTakeover, true);
+        });
+
+        return function removeAutoTriggerListeners() {
+            eventTypes.forEach((eventType) => {
+                eventTarget.removeEventListener(
+                    eventType,
+                    handleUserTakeover,
+                    true
+                );
+            });
+        };
+    }
+
+    // CommonJS 导出仅供无 DOM 的 Node 测试使用，避免污染宿主页面可能存在的 module
+    if (
+        typeof document === 'undefined' &&
+        typeof module !== 'undefined' &&
+        module.exports
+    ) {
+        module.exports = {
+            createAutoTriggerController,
+            shouldCancelAutoTrigger,
+            bindAutoTriggerCancellation,
+            updateAutoTriggerCancellationToast,
+        };
+    }
+
+    // Node 测试只加载上方纯函数，浏览器注入逻辑仅在存在 document 时执行
+    if (typeof document === 'undefined') return;
+
     let script = document.currentScript;
     if (!script?.dataset?.quickLogin) return;
 
@@ -19,6 +154,8 @@
                 closeCallback?.();
             }, 500);
         }, 2000);
+
+        return toast;
     }
 
     function getUrlParams(url = window.location.href) {
@@ -151,17 +288,7 @@
     }
 
     function getCaptchaInput() {
-        const selectors = [
-            '#verify_code',
-            '#verifyCode',
-            '#captcha',
-            'input[name="verify_code"]',
-            'input[name="verifyCode"]',
-            'input[name="captcha"]',
-            'input[placeholder*="验证码"]',
-            'input[placeholder*="校验码"]',
-        ];
-        return document.querySelector(selectors.join(','));
+        return document.querySelector(CAPTCHA_INPUT_SELECTOR);
     }
 
     function getCaptchaImage() {
@@ -182,7 +309,10 @@
         if (!src) return '';
 
         try {
-            return new URL(src, window.location.origin).searchParams.get('key') || '';
+            return (
+                new URL(src, window.location.origin).searchParams.get('key') ||
+                ''
+            );
         } catch (error) {
             return '';
         }
@@ -318,10 +448,10 @@
                 // 判断是否为验证码相关错误（过期、错误、不正确等）
                 const isCaptchaError =
                     res.code === 0 &&
-                    /验证码.*(过期|错误|不正确|失效|失败)|captcha.*(expired|error|invalid)/i.test(message);
-                const captchaImage = isCaptchaError
-                    ? getCaptchaImage()
-                    : null;
+                    /验证码.*(过期|错误|不正确|失效|失败)|captcha.*(expired|error|invalid)/i.test(
+                        message
+                    );
+                const captchaImage = isCaptchaError ? getCaptchaImage() : null;
 
                 // 验证码错误时刷新并重新登录一次，避免持续错误导致无限重试
                 if (
@@ -379,17 +509,22 @@
     try {
         const { quickLogin } = script.dataset;
         const loginConfig = JSON.parse(quickLogin || '{}');
-        const { username, password, jumpProductPath, defaultTenantId, ocrApiUrl, autoTrigger, autoTriggerDelay } =
-            loginConfig;
+        const {
+            username,
+            password,
+            jumpProductPath,
+            defaultTenantId,
+            ocrApiUrl,
+            autoTrigger,
+            autoTriggerDelay,
+        } = loginConfig;
 
         var loginBtn = createLoginButton();
-        var autoTriggerTimer = null;
+        var autoTriggerController = null;
+        var removeAutoTriggerListeners = () => {};
         loginBtn.addEventListener('click', async function () {
             // 手动点击时取消自动触发
-            if (autoTriggerTimer) {
-                clearTimeout(autoTriggerTimer);
-                autoTriggerTimer = null;
-            }
+            autoTriggerController?.cancel();
             if (!username || !password) {
                 showToast(
                     '未配置账号或密码，即将为您打开扩展选项页进行配置...',
@@ -465,14 +600,30 @@
 
         // 进入登录页面后延迟自动触发快速登录
         if (String(autoTrigger) !== 'false') {
-            const delay = (Number(autoTriggerDelay ?? 3)) * 1000;
-            autoTriggerTimer = setTimeout(() => {
-                autoTriggerTimer = null;
-                showToast('即将自动触发快速登录...');
-                setTimeout(() => {
+            const delay = Number(autoTriggerDelay ?? 3) * 1000;
+            let countdownToast = null;
+            autoTriggerController = createAutoTriggerController({
+                delay,
+                countdownDelay: 1500,
+                onCountdown: () => {
+                    countdownToast = showToast('即将自动触发快速登录...');
+                },
+                onTrigger: () => {
+                    removeAutoTriggerListeners();
                     loginBtn.click();
-                }, 1500);
-            }, delay);
+                },
+                onCancel: () => {
+                    removeAutoTriggerListeners();
+                    // 倒计时提示尚未出现时静默取消，避免无操作上下文的额外提示
+                    updateAutoTriggerCancellationToast(countdownToast);
+                },
+            });
+            removeAutoTriggerListeners = bindAutoTriggerCancellation({
+                eventTarget: document,
+                controller: autoTriggerController,
+                getCaptchaImage,
+            });
+            autoTriggerController.schedule();
         }
     } catch (error) {
         console.log('注入失败', error);
