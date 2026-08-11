@@ -1,0 +1,16 @@
+package.json
+  h_0c940a947252a6 3
+CHANGELOG.md
+  h_0c940a947252a6 5-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e5f1be0ae5fc6c3797b44fd0b60222551bcf4b4d",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
