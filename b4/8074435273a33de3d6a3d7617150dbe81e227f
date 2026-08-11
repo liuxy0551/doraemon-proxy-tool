@@ -1,0 +1,68 @@
+src/pages/Content/index.js
+  s_c3a308c4581c45::t_f57ebe8a97b44d 137-148
+  s_c3a308c4581c45::t_43556adcaae3d8 15
+  s_c3a308c4581c45::t_42b7f6ccfc3533 295,365-383
+  s_c3a308c4581c45::t_22993c97bdd87f 268
+  s_c3a308c4581c45::t_de363337cd2f8d 326,335,337,341
+  s_c3a308c4581c45::t_9fd92f2592b9a9 442
+  s_c3a308c4581c45::t_0fcc3150f05654 16,20-21
+  s_c3a308c4581c45::t_1e42e6bb075155 13,17-19,118-123,149-250,257-258,269,279,296,302,308,316,318-325,327-334,336,338-340,342-364,384-441,443-449
+  s_c3a308c4581c45::t_b16b6930af6149 14
+  s_c3a308c4581c45::t_efdb8f741c4174 124-126,134-136
+  s_c3a308c4581c45::t_7b7a64c025414c 251-256
+  s_c3a308c4581c45::t_5c48ac328b7910 259-261,265-267
+  s_c3a308c4581c45::t_8bea5773852507 270-272,276-278
+  s_c3a308c4581c45::t_fc233676336f3d 280-282,292-294
+  s_c3a308c4581c45::t_b5514edc8d65d5 297-301
+  s_c3a308c4581c45::t_8f4c9d35aeda86 303-307
+  s_c3a308c4581c45::t_dbbec0871d63db 309-311,313-315
+  s_c3a308c4581c45::t_3e54c579998aa0 317
+  s_c3a308c4581c45::t_880acce37cc9fd 127-133,262-264,273-275,283-291,312
+src/pages/Content/content.styles.css
+  h_0c940a947252a6 135-136,140-142,146-151,169-170,172-173,215-222,229-230,232-233,262,288-297
+  s_c3a308c4581c45::t_bb4d2c3fcb6b1b 242-250
+  s_c3a308c4581c45::t_2b31247ef199c0 106-134,137-139,143-145,152-168,171,174-214,223-228,234-239,251-261,263-287,298
+  s_c3a308c4581c45::t_58ecf2b85202a0 240-241
+  s_850dad7f097350::t_8e04892a1384b5 231
+src/pages/Background/index.ts
+  s_c3a308c4581c45::t_354d1ca8252a50 173
+src/pages/Content/gitlab-reviewer.js
+  s_c3a308c4581c45::t_92ed839d9b67fc 1-174
+src/typings/index.d.ts
+  s_c3a308c4581c45::t_887e8c3187cd0b 47
+src/pages/Options/Options.tsx
+  s_c3a308c4581c45::t_dd1bf5a9be6645 62-64
+  s_c3a308c4581c45::t_207c066383af9c 410-419
+  s_c3a308c4581c45::t_b1121fefb4ca51 420-421
+src/manifest.json
+  s_850dad7f097350::t_1ea18a898f7343 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "b48074435273a33de3d6a3d7617150dbe81e227f",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_850dad7f097350": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fef86-206a-7e11-abed-46e2b19cd3ad",
+        "model": "unknown"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_c3a308c4581c45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "66257992-681c-4f95-bd44-4f90096c900f",
+        "model": "deepseek-v4-flash"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
