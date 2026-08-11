@@ -170,6 +170,7 @@ export const initStorage: IStorageCache = {
             defaultTenantId: '1',
             ocrApiUrl: 'http://172.16.100.225:8000',
         },
+        gitlabReviewEnabled: true,
     },
     // 记录用户上次操作的状态
     clientUserState: {

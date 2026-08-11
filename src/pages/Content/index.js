@@ -10,6 +10,15 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         }
     }
 
+    // 检测 GitLab MR 页面，添加 AI CodeReview 悬浮面板（内容脚本直接操作 DOM）
+    if (
+        config?.gitlabReviewEnabled !== false &&
+        location.hostname.indexOf('gitlab.') !== -1 &&
+        /\/-\/merge_requests\/\d+/.test(location.pathname)
+    ) {
+        injectGitlabReviewer();
+    }
+
     if (
         !isMatchedHost(config?.matchUrls, location.hostname) &&
         !allEnvList?.some((env) => isSameHostname(env.url))
@@ -106,3 +115,335 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         document.documentElement.appendChild(loginScript);
     }
 });
+
+/**
+ * GitLab MR 页面 AI CodeReview 悬浮面板
+ * 内容脚本直接调用，不依赖页面级脚本注入
+ */
+function injectGitlabReviewer() {
+    var discussionsUrl = location.origin + location.pathname + '/discussions.json?per_page=100';
+    var panelId = 'doraemon-gitlab-panel';
+    var panelLogoUrl = chrome.runtime.getURL('icon-16.png');
+    var panelPosition = {
+        top: 60,
+        right: 16,
+        left: null,
+    };
+    var dragState = {
+        active: false,
+        offsetX: 0,
+        offsetY: 0,
+    };
+    // 持久化存储键，按 MR 路径隔离
+    var positionStorageKey = 'gitlabPanelPosition_' + location.pathname.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    function savePanelPosition() {
+        var data = {};
+        data[positionStorageKey] = {
+            left: panelPosition.left,
+            right: panelPosition.right,
+            top: panelPosition.top,
+        };
+        chrome.storage.local.set(data);
+    }
+
+    function formatTime(dateStr) {
+        var d = new Date(dateStr);
+        return (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+            String(d.getHours()).padStart(2, '0') + ':' +
+            String(d.getMinutes()).padStart(2, '0');
+    }
+
+    function scoreClass(score) {
+        if (score === null) return '';
+        if (score >= 85) return 'score-good';
+        if (score >= 70) return 'score-ok';
+        return 'score-bad';
+    }
+
+    function extractScore(body) {
+        if (typeof body !== 'string') return null;
+        var match = body.match(/总分(?:为)?\s*[：:]?\s*(\d+)\s*分/);
+        if (!match) {
+            match = body.match(/总分\s*[\|\t ]+\s*(\d+)\s*分/);
+        }
+        return match ? parseInt(match[1], 10) : null;
+    }
+
+    function extractTextFromHtml(html) {
+        if (typeof html !== 'string' || !html) return '';
+        var temp = document.createElement('div');
+        temp.innerHTML = html;
+        return temp.textContent || temp.innerText || '';
+    }
+
+    function extractRenderedNoteText(noteId) {
+        if (!noteId) return '';
+        var noteRoot = document.getElementById('note_' + noteId);
+        if (!noteRoot) return '';
+        var noteText = noteRoot.querySelector('.note-text');
+        if (!noteText) return '';
+        return noteText.textContent || noteText.innerText || '';
+    }
+
+    function extractScoreFromNote(note) {
+        var candidates = [
+            note?.body,
+            note?.note_html,
+            note?.body_html,
+            note?.rendered_body,
+            extractTextFromHtml(note?.note_html),
+            extractTextFromHtml(note?.body_html),
+            extractTextFromHtml(note?.rendered_body),
+            extractRenderedNoteText(note?.id),
+        ];
+
+        for (var i = 0; i < candidates.length; i++) {
+            var score = extractScore(candidates[i]);
+            if (score !== null) return score;
+        }
+
+        return null;
+    }
+
+    function getMountNode() {
+        return document.body || document.documentElement;
+    }
+
+    function ensurePanel() {
+        var panel = document.getElementById(panelId);
+        if (panel) return panel;
+
+        panel = document.createElement('div');
+        panel.id = panelId;
+        panel.className = 'doraemon-gitlab-panel';
+        panel.innerHTML =
+            '<div class="doraemon-gitlab-header">' +
+                '<span class="doraemon-gitlab-header-title">' +
+                    '<img class="doraemon-gitlab-header-logo" src="' + panelLogoUrl + '" alt="Doraemon logo" />' +
+                    '<span>AI CodeReview 列表</span>' +
+                '</span>' +
+                '<button class="doraemon-gitlab-close" title="关闭">&times;</button>' +
+            '</div>' +
+            '<div class="doraemon-gitlab-body"></div>';
+
+        panel.querySelector('.doraemon-gitlab-close').addEventListener('click', function () {
+            panel.remove();
+        });
+
+        getMountNode().appendChild(panel);
+        applyPanelPosition(panel);
+        bindDragEvents(panel);
+        return panel;
+    }
+
+    function applyPanelPosition(panel) {
+        if (panelPosition.left === null) {
+            panel.style.left = '';
+            panel.style.right = panelPosition.right + 'px';
+        } else {
+            panel.style.left = panelPosition.left + 'px';
+            panel.style.right = 'auto';
+        }
+        panel.style.top = panelPosition.top + 'px';
+    }
+
+    function clampPanelPosition(panel, nextLeft, nextTop) {
+        var maxLeft = Math.max(window.innerWidth - panel.offsetWidth, 0);
+        var maxTop = Math.max(window.innerHeight - panel.offsetHeight, 0);
+        return {
+            left: Math.min(Math.max(nextLeft, 0), maxLeft),
+            top: Math.min(Math.max(nextTop, 0), maxTop),
+        };
+    }
+
+    function bindDragEvents(panel) {
+        var header = panel.querySelector('.doraemon-gitlab-header');
+        if (!header) return;
+
+        function stopDragging() {
+            dragState.active = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopDragging);
+            savePanelPosition();
+        }
+
+        function handleMouseMove(event) {
+            if (!dragState.active) return;
+            var nextLeft = event.clientX - dragState.offsetX;
+            var nextTop = event.clientY - dragState.offsetY;
+            var nextPosition = clampPanelPosition(panel, nextLeft, nextTop);
+            panelPosition.left = nextPosition.left;
+            panelPosition.top = nextPosition.top;
+            applyPanelPosition(panel);
+        }
+
+        header.addEventListener('mousedown', function (event) {
+            // 点击关闭按钮时保持原交互，不进入拖拽
+            if (event.target.closest('.doraemon-gitlab-close')) return;
+
+            var rect = panel.getBoundingClientRect();
+            dragState.active = true;
+            dragState.offsetX = event.clientX - rect.left;
+            dragState.offsetY = event.clientY - rect.top;
+            panelPosition.left = rect.left;
+            panelPosition.top = rect.top;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopDragging);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', stopDragging);
+        });
+    }
+
+    function setPanelContent(html) {
+        var panel = ensurePanel();
+        var body = panel.querySelector('.doraemon-gitlab-body');
+        body.innerHTML = html;
+    }
+
+    function renderLoadingPanel() {
+        setPanelContent(
+            '<div class="doraemon-gitlab-status">正在读取 AI Review 记录...</div>'
+        );
+    }
+
+    function renderErrorPanel(message) {
+        setPanelContent(
+            '<div class="doraemon-gitlab-status doraemon-gitlab-status-error">' +
+                '读取失败：' + message +
+            '</div>'
+        );
+    }
+
+    function renderFloatingPanel(notes) {
+        ensurePanel();
+
+        notes.sort(function (a, b) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        var latestScore = notes.length > 0 ? notes[0].score : null;
+        var baseUrl = location.origin + location.pathname;
+
+        var reviewListHtml = '';
+        if (notes.length > 0) {
+            var items = '';
+            for (var i = 0; i < notes.length; i++) {
+                var note = notes[i];
+                var sc = note.score !== null ? note.score + '分' : '未识别';
+                var scCls = scoreClass(note.score);
+                var anchor = baseUrl + '#note_' + note.id;
+                items +=
+                    '<a class="doraemon-gitlab-review-item" href="' + anchor + '" target="_self">' +
+                        '<span class="doraemon-gitlab-review-index">#' + (notes.length - i) + '</span>' +
+                        '<span class="doraemon-gitlab-review-score ' + scCls + '">' + sc + '</span>' +
+                        '<span class="doraemon-gitlab-review-time">' + formatTime(note.createdAt) + '</span>' +
+                    '</a>';
+            }
+            reviewListHtml =
+                '<div class="doraemon-gitlab-review-section">' +
+                    '<h4 class="doraemon-gitlab-review-title">审查历史 (' + notes.length + '次)</h4>' +
+                    '<div class="doraemon-gitlab-review-list">' + items + '</div>' +
+                '</div>';
+        } else {
+            reviewListHtml = '<div class="doraemon-gitlab-empty">暂无审查记录</div>';
+        }
+
+        var latestScoreHtml = '';
+        if (latestScore !== null) {
+            latestScoreHtml =
+                '<div class="doraemon-gitlab-latest-score">' +
+                    '<span class="doraemon-gitlab-score-label">最新评分</span>' +
+                    '<span class="doraemon-gitlab-score-value ' + scoreClass(latestScore) + '">' + latestScore + '分</span>' +
+                '</div>';
+        }
+
+        setPanelContent(latestScoreHtml + reviewListHtml);
+    }
+
+    function fetchDiscussions() {
+        // 先加载保存的面板位置，再发起请求（避免面板先显示默认位置再跳转）
+        chrome.storage.local.get(positionStorageKey, function (result) {
+            var saved = result[positionStorageKey];
+            if (saved) {
+                if (saved.left !== null && saved.left !== undefined) {
+                    panelPosition.left = saved.left;
+                    panelPosition.right = null;
+                } else if (saved.right !== undefined) {
+                    panelPosition.right = saved.right;
+                    panelPosition.left = null;
+                }
+                panelPosition.top = saved.top;
+            }
+
+            doFetchDiscussions();
+        });
+    }
+
+    function doFetchDiscussions() {
+        var csrfToken = '';
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta) {
+            csrfToken = meta.getAttribute('content');
+        }
+
+        var headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+        };
+        if (csrfToken) {
+            headers['X-CSRF-Token'] = csrfToken;
+        }
+
+        renderLoadingPanel();
+
+        fetch(discussionsUrl, {
+            credentials: 'same-origin',
+            headers: headers,
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                var reviewerNotes = [];
+
+                for (var d = 0; d < data.length; d++) {
+                    var discussion = data[d];
+                    var notes = discussion.notes || [];
+                    for (var n = 0; n < notes.length; n++) {
+                        var note = notes[n];
+                        if (
+                            note.author &&
+                            (note.author.name === 'Front-Gitlab-AI-CodeReviewer' ||
+                             note.author.username === 'group_10_bot_33a8ceb162e44e0cf49bb168b87ed7da')
+                        ) {
+                            var noteBody = typeof note.body === 'string' ? note.body : '';
+                            // GitLab discussions.json 的原始 body 和页面渲染文本不完全一致，这里做多字段兜底
+                            var score = extractScoreFromNote(note);
+                            reviewerNotes.push({
+                                id: note.id,
+                                score: score,
+                                createdAt: note.created_at,
+                                body: noteBody,
+                            });
+                        }
+                    }
+                }
+
+                renderFloatingPanel(reviewerNotes);
+            })
+            .catch(function (err) {
+                console.error('Doraemon: 获取 GitLab 讨论失败', err);
+                renderErrorPanel(err?.message || '未知错误');
+            });
+    }
+
+    // 页面加载完成后获取讨论数据
+    if (document.readyState === 'complete') {
+        fetchDiscussions();
+    } else {
+        window.addEventListener('load', fetchDiscussions);
+    }
+}

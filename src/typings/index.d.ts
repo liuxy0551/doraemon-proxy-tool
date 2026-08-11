@@ -44,6 +44,7 @@ interface IConfig {
         defaultTenantId: string;
         ocrApiUrl: string;
     };
+    gitlabReviewEnabled: boolean;
 }
 
 interface IStorageCache {

@@ -24,7 +24,7 @@
     ],
     "web_accessible_resources": [
         {
-            "resources": ["devops.js", "devops-login.js", "sm2.js"],
+            "resources": ["devops.js", "devops-login.js", "sm2.js", "icon-16.png"],
             "matches": ["<all_urls>"]
         }
     ]

@@ -103,3 +103,196 @@
     width: 65%;
     padding-right: 10px;
 }
+
+/* ---- GitLab AI CodeReview 悬浮面板 ---- */
+.doraemon-gitlab-panel {
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    z-index: 9999;
+    width: 280px;
+    max-height: 400px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, sans-serif;
+    font-size: 13px;
+    color: #333;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.doraemon-gitlab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    cursor: move;
+    user-select: none;
+}
+
+.doraemon-gitlab-header-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.doraemon-gitlab-header-logo {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.doraemon-gitlab-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: #999;
+    padding: 0 4px;
+}
+
+.doraemon-gitlab-close:hover {
+    color: #333;
+}
+
+.doraemon-gitlab-body {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    overflow: hidden;
+    min-height: 0;
+    flex: 1;
+}
+
+.doraemon-gitlab-latest-score {
+    text-align: center;
+    padding: 10px 0 14px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 12px;
+}
+
+.doraemon-gitlab-score-label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.doraemon-gitlab-score-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.doraemon-gitlab-score-value.score-good {
+    color: #28a745;
+}
+
+.doraemon-gitlab-score-value.score-ok {
+    color: #f5a623;
+}
+
+.doraemon-gitlab-score-value.score-bad {
+    color: #d73a49;
+}
+
+.doraemon-gitlab-review-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.doraemon-gitlab-review-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    flex: 1;
+}
+
+.doraemon-gitlab-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    flex: 1;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.doraemon-gitlab-review-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
+    min-height: 30px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s;
+}
+
+.doraemon-gitlab-review-item:hover {
+    background-color: #f0f2f5;
+    text-decoration: none;
+}
+
+.doraemon-gitlab-review-index {
+    color: #999;
+    font-size: 11px;
+    min-width: 20px;
+}
+
+.doraemon-gitlab-review-score {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 52px;
+}
+
+.doraemon-gitlab-review-score.score-good {
+    color: #28a745;
+}
+
+.doraemon-gitlab-review-score.score-ok {
+    color: #f5a623;
+}
+
+.doraemon-gitlab-review-score.score-bad {
+    color: #d73a49;
+}
+
+.doraemon-gitlab-review-time {
+    color: #999;
+    font-size: 11px;
+    margin-left: auto;
+}
+
+.doraemon-gitlab-empty {
+    text-align: center;
+    color: #999;
+    padding: 16px 0;
+    font-size: 13px;
+}
+
+.doraemon-gitlab-status {
+    color: #4c4f5a;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.doraemon-gitlab-status-error {
+    color: #d4380d;
+}

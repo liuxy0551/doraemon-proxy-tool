@@ -59,6 +59,9 @@ const Options: React.FC<IProps> = () => {
         if ('devopsInjectEnabled' in changedValues) {
             newConfig.devopsInjectEnabled = changedValues.devopsInjectEnabled;
         }
+        if ('gitlabReviewEnabled' in changedValues) {
+            newConfig.gitlabReviewEnabled = changedValues.gitlabReviewEnabled;
+        }
         if ('quickLogin' in changedValues) {
             newConfig.quickLogin = Object.assign(
                 {},
@@ -402,6 +405,18 @@ const Options: React.FC<IProps> = () => {
                                         </>
                                     )
                                 }
+                            </Form.Item>
+                        </div>
+                        <div className="option-item">
+                            <div className="option-title">GitLab CodeReview</div>
+                            <Form.Item
+                                name="gitlabReviewEnabled"
+                                label="AI CodeReview 悬浮面板"
+                                tooltip="在 GitLab MR 页面右上角展示 Front-Gitlab-AI-CodeReviewer 的评论列表和评分"
+                                initialValue={config.gitlabReviewEnabled !== false}
+                                valuePropName="checked"
+                            >
+                                <Switch />
                             </Form.Item>
                         </div>
                     </Form>
