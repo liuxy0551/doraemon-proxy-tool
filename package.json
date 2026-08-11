@@ -19,7 +19,7 @@
         "start": "node scripts/webserver.js",
         "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
         "release": "standard-version",
-        "repack": "node scripts/repack.js"
+        "pack": "node scripts/repack.js"
     },
     "dependencies": {
         "@ant-design/happy-work-theme": "^1.0.0",

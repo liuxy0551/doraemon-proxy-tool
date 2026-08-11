@@ -20,7 +20,7 @@ pnpm build
 
 可选：根据版本语义化重新命名文件夹
 ```
-pnpm repack
+pnpm pack
 ```
 
 3. 浏览器加载扩展程序选择 doraemon-proxy-tool-xxx 文件夹
