@@ -45,6 +45,7 @@ interface IConfig {
         ocrApiUrl: string;
     };
     gitlabReviewEnabled: boolean;
+    gitlabScrollTopEnabled: boolean;
 }
 
 interface IStorageCache {

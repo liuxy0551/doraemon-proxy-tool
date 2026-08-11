@@ -16,7 +16,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         location.hostname.indexOf('gitlab.') !== -1 &&
         /\/-\/merge_requests\/\d+/.test(location.pathname)
     ) {
-        injectGitlabReviewer();
+        injectGitlabReviewer(config);
     }
 
     if (
@@ -120,10 +120,12 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
  * GitLab MR 页面 AI CodeReview 悬浮面板
  * 内容脚本直接调用，不依赖页面级脚本注入
  */
-function injectGitlabReviewer() {
+function injectGitlabReviewer(config) {
     var discussionsUrl = location.origin + location.pathname + '/discussions.json?per_page=100';
     var panelId = 'doraemon-gitlab-panel';
     var panelLogoUrl = chrome.runtime.getURL('icon-16.png');
+    var showScrollTopButton = config?.gitlabScrollTopEnabled !== false;
+    var scrollTopThreshold = 240;
     var panelPosition = {
         top: 60,
         right: 16,
@@ -210,6 +212,19 @@ function injectGitlabReviewer() {
         return document.body || document.documentElement;
     }
 
+    function renderScrollTopButton() {
+        if (!showScrollTopButton) return '';
+        return (
+            '<button class="doraemon-gitlab-scroll-top" type="button" title="回到顶部" aria-label="回到顶部">' +
+                '<span class="doraemon-gitlab-scroll-top-icon" aria-hidden="true">' +
+                    '<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M896 96H128c-17.066667 0-32 14.933333-32 32S110.933333 160 128 160h768c17.066667 0 32-14.933333 32-32s-14.933333-32-32-32zM535.466667 296.533333c-12.8-12.8-32-12.8-44.8 0l-213.333334 213.333334c-12.8 12.8-12.8 32 0 44.8s32 12.8 44.8 0l157.866667-157.866667V853.333333c0 17.066667 14.933333 32 32 32s32-14.933333 32-32V396.8l157.866667 157.866667c6.4 6.4 14.933333 8.533333 23.466666 8.533333s17.066667-2.133333 23.466667-8.533333c12.8-12.8 12.8-32 0-44.8l-213.333333-213.333334z" fill="#666666"></path>' +
+                    '</svg>' +
+                '</span>' +
+            '</button>'
+        );
+    }
+
     function ensurePanel() {
         var panel = document.getElementById(panelId);
         if (panel) return panel;
@@ -234,6 +249,7 @@ function injectGitlabReviewer() {
         getMountNode().appendChild(panel);
         applyPanelPosition(panel);
         bindDragEvents(panel);
+        bindScrollTopButtonEvents(panel);
         return panel;
     }
 
@@ -295,10 +311,78 @@ function injectGitlabReviewer() {
         });
     }
 
+    function updateScrollTopButtonVisibility(panel) {
+        var scrollTopButton = panel.querySelector('.doraemon-gitlab-scroll-top');
+        if (!scrollTopButton) return;
+        scrollTopButton.classList.toggle(
+            'is-visible',
+            showScrollTopButton && window.scrollY > scrollTopThreshold
+        );
+    }
+
+    function bindScrollTopButtonEvents(panel) {
+        var scrollTopButton = panel.querySelector('.doraemon-gitlab-scroll-top');
+        if (!scrollTopButton || scrollTopButton.dataset.bound === 'true') return;
+
+        scrollTopButton.dataset.bound = 'true';
+        scrollTopButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            scrollPageToTop();
+        });
+
+        // 页面滚动到一定距离后才显示，避免默认干扰当前信息
+        var handleWindowScroll = function () {
+            updateScrollTopButtonVisibility(panel);
+        };
+        window.addEventListener('scroll', handleWindowScroll, { passive: true });
+        updateScrollTopButtonVisibility(panel);
+    }
+
+    function scrollElementToTop(element) {
+        if (!element) return;
+        if (typeof element.scrollTo === 'function') {
+            element.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
+        }
+        element.scrollTop = 0;
+    }
+
+    function scrollPageToTop() {
+        var rootCandidates = [
+            window,
+            document.scrollingElement,
+            document.documentElement,
+            document.body,
+            document.querySelector('.layout-page'),
+            document.querySelector('.content-wrapper'),
+            document.querySelector('.page-content'),
+            document.querySelector('[data-testid="page-content"]'),
+            document.querySelector('main'),
+        ];
+
+        // GitLab 页面在不同布局下可能不是 window 在滚动，这里对常见根容器逐个兜底
+        for (var i = 0; i < rootCandidates.length; i++) {
+            var target = rootCandidates[i];
+            if (!target) continue;
+            if (target === window) {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+                continue;
+            }
+            scrollElementToTop(target);
+        }
+    }
+
     function setPanelContent(html) {
         var panel = ensurePanel();
         var body = panel.querySelector('.doraemon-gitlab-body');
         body.innerHTML = html;
+        bindScrollTopButtonEvents(panel);
     }
 
     function renderLoadingPanel() {
@@ -342,7 +426,10 @@ function injectGitlabReviewer() {
             }
             reviewListHtml =
                 '<div class="doraemon-gitlab-review-section">' +
-                    '<h4 class="doraemon-gitlab-review-title">审查历史 (' + notes.length + '次)</h4>' +
+                    '<div class="doraemon-gitlab-review-title-row">' +
+                        '<h4 class="doraemon-gitlab-review-title">审查历史 (' + notes.length + '次)</h4>' +
+                        renderScrollTopButton() +
+                    '</div>' +
                     '<div class="doraemon-gitlab-review-list">' + items + '</div>' +
                 '</div>';
         } else {
@@ -359,6 +446,7 @@ function injectGitlabReviewer() {
         }
 
         setPanelContent(latestScoreHtml + reviewListHtml);
+        updateScrollTopButtonVisibility(ensurePanel());
     }
 
     function fetchDiscussions() {
