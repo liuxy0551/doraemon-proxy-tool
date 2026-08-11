@@ -124,7 +124,7 @@ function injectGitlabReviewer(config) {
     var discussionsUrl = location.origin + location.pathname + '/discussions.json?per_page=100';
     var panelId = 'doraemon-gitlab-panel';
     var panelLogoUrl = chrome.runtime.getURL('icon-16.png');
-    var showScrollTopButton = config?.gitlabScrollTopEnabled !== false;
+    var showScrollTopButton = true;
     var scrollTopThreshold = 240;
     var panelPosition = {
         top: 60,

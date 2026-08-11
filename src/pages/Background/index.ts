@@ -171,7 +171,6 @@ export const initStorage: IStorageCache = {
             ocrApiUrl: 'http://172.16.100.225:8000',
         },
         gitlabReviewEnabled: true,
-        gitlabScrollTopEnabled: true,
     },
     // 记录用户上次操作的状态
     clientUserState: {

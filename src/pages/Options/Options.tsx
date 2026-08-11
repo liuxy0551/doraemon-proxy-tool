@@ -62,10 +62,6 @@ const Options: React.FC<IProps> = () => {
         if ('gitlabReviewEnabled' in changedValues) {
             newConfig.gitlabReviewEnabled = changedValues.gitlabReviewEnabled;
         }
-        if ('gitlabScrollTopEnabled' in changedValues) {
-            newConfig.gitlabScrollTopEnabled =
-                changedValues.gitlabScrollTopEnabled;
-        }
         if ('quickLogin' in changedValues) {
             newConfig.quickLogin = Object.assign(
                 {},
@@ -418,17 +414,6 @@ const Options: React.FC<IProps> = () => {
                                 label="AI CodeReview 悬浮面板"
                                 tooltip="在 GitLab MR 页面右上角展示 Front-Gitlab-AI-CodeReviewer 的评论列表和评分"
                                 initialValue={config.gitlabReviewEnabled !== false}
-                                valuePropName="checked"
-                            >
-                                <Switch />
-                            </Form.Item>
-                            <Form.Item
-                                name="gitlabScrollTopEnabled"
-                                label="审查历史回顶按钮"
-                                tooltip="页面滚动超过一定距离后，在审查历史标题右侧显示回到顶部按钮"
-                                initialValue={
-                                    config.gitlabScrollTopEnabled !== false
-                                }
                                 valuePropName="checked"
                             >
                                 <Switch />
