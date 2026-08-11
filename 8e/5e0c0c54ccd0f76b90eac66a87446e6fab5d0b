@@ -1,0 +1,27 @@
+src/pages/Background/index.ts
+  s_850dad7f097350::t_075ef7f4b1f9a5 174
+src/pages/Content/content.styles.css
+  s_850dad7f097350::t_13fb0a441dfbb7 217-223,280-325
+src/pages/Content/index.js
+  s_850dad7f097350::t_3053d7aedaf51f 19,123,127-128,215-227,252,314-380,385,429-432,449
+src/pages/Options/Options.tsx
+  s_850dad7f097350::t_4cb4423e8a8d8d 65-68,425-435
+src/typings/index.d.ts
+  s_850dad7f097350::t_fb35db813f05dd 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "8e5e0c0c54ccd0f76b90eac66a87446e6fab5d0b",
+  "prompts": {},
+  "sessions": {
+    "s_850dad7f097350": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fef86-206a-7e11-abed-46e2b19cd3ad",
+        "model": "unknown"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
