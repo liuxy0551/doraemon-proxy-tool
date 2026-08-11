@@ -1,0 +1,24 @@
+src/pages/Content/index.js
+  s_850dad7f097350::t_8127d31fc5b09f 127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "09bac5071a530443b1f631c3c349e948b6cce963",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_850dad7f097350": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fef86-206a-7e11-abed-46e2b19cd3ad",
+        "model": "gpt-5.4"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
