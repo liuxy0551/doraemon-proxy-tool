@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.7.1...v1.8.0) (2026-08-11)
+
+
+### Features
+
+* cancel quick login on interaction ([2deb135](https://github.com/liuxy0551/doraemon-proxy-tool/commit/2deb13530b0dba2d47b40dd575d95531d0172819))
+* persist GitLab CodeReview panel position across refreshes ([8e5e0c0](https://github.com/liuxy0551/doraemon-proxy-tool/commit/8e5e0c0c54ccd0f76b90eac66a87446e6fab5d0b))
+* persist GitLab CodeReview panel position across refreshes ([b480744](https://github.com/liuxy0551/doraemon-proxy-tool/commit/b48074435273a33de3d6a3d7617150dbe81e227f))
+
+
+### Bug Fixes
+
+* broaden captcha error detection to cover expired/incorrect/invalid cases ([3219837](https://github.com/liuxy0551/doraemon-proxy-tool/commit/3219837891c1f44d294ce601b10a39f4f42df797))
+* preserve port in devops link rewriting ([889af48](https://github.com/liuxy0551/doraemon-proxy-tool/commit/889af488e92c8f2074fce051fe73d68ac98c3553))
+
 ### [1.7.1](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.7.0...v1.7.1) (2026-07-27)
 
 
