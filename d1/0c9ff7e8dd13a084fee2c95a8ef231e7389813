@@ -1,0 +1,28 @@
+src/pages/Content/index.js
+  s_926e32783ca441::t_0ddeae169b4d9c 146-147
+  s_926e32783ca441::t_d2ceebe6aaa445 123-127,129-130,135,417,530,539-552
+README.md
+  s_926e32783ca441::t_f8711c003dd086 44-54
+  s_926e32783ca441::t_1c2f6ae341ba9d 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d10c9ff7e8dd13a084fee2c95a8ef231e7389813",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_926e32783ca441": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e150dcee-94fb-4062-8566-7413028073cd",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
