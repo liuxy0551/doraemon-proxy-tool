@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.8.0...v1.8.1) (2026-08-14)
+
+
+### Features
+
+* make latest score clickable in GitLab CodeReview panel ([f3e5cfe](https://github.com/liuxy0551/doraemon-proxy-tool/commit/f3e5cfe3ae173d23447e30ff5374343f1d5b9c15))
+
+
+### Bug Fixes
+
+* correct GitLab CodeReview panel on MR sub-tabs ([d10c9ff](https://github.com/liuxy0551/doraemon-proxy-tool/commit/d10c9ff7e8dd13a084fee2c95a8ef231e7389813))
+
 ## [1.8.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.7.1...v1.8.0) (2026-08-11)
 
 
