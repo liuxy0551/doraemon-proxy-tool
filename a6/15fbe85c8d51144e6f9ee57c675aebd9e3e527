@@ -1,0 +1,21 @@
+src/pages/Content/content.styles.css
+  s_f384be03c2184a::t_9413d046638e6e 178,183-192
+src/pages/Content/index.js
+  s_f384be03c2184a::t_633a8705a84e8b 448,450,453
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a615fbe85c8d51144e6f9ee57c675aebd9e3e527",
+  "prompts": {},
+  "sessions": {
+    "s_f384be03c2184a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "69c79182-82ea-4db4-adff-96f2b60a451f",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
