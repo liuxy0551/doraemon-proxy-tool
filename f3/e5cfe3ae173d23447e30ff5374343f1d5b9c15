@@ -1,0 +1,26 @@
+src/pages/Content/content.styles.css
+  s_f384be03c2184a::t_d710555e0ef67a 178,183-192
+src/pages/Content/index.js
+  s_f384be03c2184a::t_caff63f1e766a2 448,450,453
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f3e5cfe3ae173d23447e30ff5374343f1d5b9c15",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_f384be03c2184a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "69c79182-82ea-4db4-adff-96f2b60a451f",
+        "model": "unknown"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
