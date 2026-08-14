@@ -120,12 +120,19 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
  * GitLab MR 页面 AI CodeReview 悬浮面板
  * 内容脚本直接调用，不依赖页面级脚本注入
  */
+function extractBaseMrPath(pathname) {
+    var match = pathname.match(/^(.*?\/-\/merge_requests\/\d+)/);
+    return match ? match[1] : pathname;
+}
+
 function injectGitlabReviewer(config) {
-    var discussionsUrl = location.origin + location.pathname + '/discussions.json?per_page=100';
+    var baseMrPath = extractBaseMrPath(location.pathname);
+    var discussionsUrl = location.origin + baseMrPath + '/discussions.json?per_page=100';
     var panelId = 'doraemon-gitlab-panel';
     var panelLogoUrl = chrome.runtime.getURL('icon-16.png');
     var showScrollTopButton = true;
     var scrollTopThreshold = 240;
+    var cachedNotes = null;
     var panelPosition = {
         top: 60,
         right: 16,
@@ -136,8 +143,8 @@ function injectGitlabReviewer(config) {
         offsetX: 0,
         offsetY: 0,
     };
-    // 持久化存储键，按 MR 路径隔离
-    var positionStorageKey = 'gitlabPanelPosition_' + location.pathname.replace(/[^a-zA-Z0-9_-]/g, '_');
+    // 持久化存储键，全局统一位置（所有 MR 共用）
+    var positionStorageKey = 'gitlabPanelPosition';
 
     function savePanelPosition() {
         var data = {};
@@ -407,7 +414,7 @@ function injectGitlabReviewer(config) {
         });
 
         var latestScore = notes.length > 0 ? notes[0].score : null;
-        var baseUrl = location.origin + location.pathname;
+        var baseUrl = location.origin + baseMrPath;
 
         var reviewListHtml = '';
         if (notes.length > 0) {
@@ -520,6 +527,7 @@ function injectGitlabReviewer(config) {
                     }
                 }
 
+                cachedNotes = reviewerNotes;
                 renderFloatingPanel(reviewerNotes);
             })
             .catch(function (err) {
@@ -527,6 +535,20 @@ function injectGitlabReviewer(config) {
                 renderErrorPanel(err?.message || '未知错误');
             });
     }
+
+    function restorePanelIfNeeded() {
+        if (document.getElementById(panelId)) return;
+        if (!/\/-\/merge_requests\/\d+/.test(location.pathname)) return;
+        if (cachedNotes) {
+            renderFloatingPanel(cachedNotes);
+        }
+    }
+
+    // GitLab 使用 Turbo/SPA 导航时不会触发整页刷新，监听导航事件恢复被销毁的面板
+    window.addEventListener('popstate', restorePanelIfNeeded);
+    document.addEventListener('turbo:load', restorePanelIfNeeded);
+    document.addEventListener('turbolinks:load', restorePanelIfNeeded);
+    document.addEventListener('pjax:end', restorePanelIfNeeded);
 
     // 页面加载完成后获取讨论数据
     if (document.readyState === 'complete') {

@@ -41,3 +41,15 @@ pnpm pack
 
 -   点开哆啦 A 梦的小图标，会自动获取到你的代理配置(每次打开都会抓取最新的数据)
 -   可以愉快的联调了
+
+<br/>
+
+## 发布 / 打 tag
+
+使用 [standard-version](https://github.com/conventional-changelog/standard-version) 自动升级版本号、生成 CHANGELOG 并打 tag：
+
+```
+npx standard-version --release-as patch
+```
+
+`--release-as` 可指定 `major` / `minor` / `patch`，分别升级语义化版本 `major.minor.patch` 的对应位。
