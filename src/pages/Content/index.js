@@ -445,11 +445,12 @@ function injectGitlabReviewer(config) {
 
         var latestScoreHtml = '';
         if (latestScore !== null) {
+            var latestAnchor = baseUrl + '#note_' + notes[0].id;
             latestScoreHtml =
-                '<div class="doraemon-gitlab-latest-score">' +
+                '<a class="doraemon-gitlab-latest-score" href="' + latestAnchor + '" target="_self" title="跳转到最新审查评论">' +
                     '<span class="doraemon-gitlab-score-label">最新评分</span>' +
                     '<span class="doraemon-gitlab-score-value ' + scoreClass(latestScore) + '">' + latestScore + '分</span>' +
-                '</div>';
+                '</a>';
         }
 
         setPanelContent(latestScoreHtml + reviewListHtml);

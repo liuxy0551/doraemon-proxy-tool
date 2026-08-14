@@ -175,10 +175,21 @@
 }
 
 .doraemon-gitlab-latest-score {
+    display: block;
     text-align: center;
     padding: 10px 0 14px;
     border-bottom: 1px solid #f0f0f0;
     margin-bottom: 12px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+}
+
+.doraemon-gitlab-latest-score:hover {
+    background-color: #f0f2f5;
+    text-decoration: none;
 }
 
 .doraemon-gitlab-score-label {
