@@ -133,6 +133,11 @@ function injectGitlabReviewer(config) {
     var showScrollTopButton = true;
     var scrollTopThreshold = 240;
     var cachedNotes = null;
+    // 面板与视口边缘保留的最小间距（默认右上角定位 right 也是 16px，保持一致）
+    var panelEdgeOffset = 16;
+    // 面板固有尺寸，用于中心线百分比与像素坐标互相换算（与 content.styles.css 保持一致）
+    var panelDefaultWidth = 280;
+    var panelDefaultHeight = 400;
     var panelPosition = {
         top: 60,
         right: 16,
@@ -146,12 +151,31 @@ function injectGitlabReviewer(config) {
     // 持久化存储键，全局统一位置（所有 MR 共用）
     var positionStorageKey = 'gitlabPanelPosition';
 
+    // 面板中心相对视口中心的百分比（正值偏右/下，负值偏左/上，0 表示居中）
+    function panelCenterPercent(panel, left, top) {
+        return {
+            x: ((left + panel.offsetWidth / 2 - window.innerWidth / 2) / (window.innerWidth / 2)) * 100,
+            y: ((top + panel.offsetHeight / 2 - window.innerHeight / 2) / (window.innerHeight / 2)) * 100,
+        };
+    }
+
+    // 从中心线百分比换算回像素坐标（恢复时面板尚未创建，用默认尺寸估算，渲染后由 applyPanelPosition 校正）
+    function panelPositionFromCenterPercent(percentX, percentY) {
+        return {
+            left: window.innerWidth / 2 + (percentX / 100) * (window.innerWidth / 2) - panelDefaultWidth / 2,
+            top: window.innerHeight / 2 + (percentY / 100) * (window.innerHeight / 2) - panelDefaultHeight / 2,
+        };
+    }
+
     function savePanelPosition() {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+        var percent = panelCenterPercent(panel, panelPosition.left, panelPosition.top);
         var data = {};
         data[positionStorageKey] = {
-            left: panelPosition.left,
-            right: panelPosition.right,
-            top: panelPosition.top,
+            v: 2,
+            centerXPercent: percent.x,
+            centerYPercent: percent.y,
         };
         chrome.storage.local.set(data);
     }
@@ -261,22 +285,31 @@ function injectGitlabReviewer(config) {
     }
 
     function applyPanelPosition(panel) {
+        // 基于当前视口尺寸做边界约束（保留 panelEdgeOffset 间距），并回写 panelPosition。
+        // 大屏保存的位置（绝对 left/top）在小屏上可能越界不可见，这里统一拉回可视范围。
+        var maxLeft = Math.max(window.innerWidth - panel.offsetWidth - panelEdgeOffset, 0);
+        var maxTop = Math.max(window.innerHeight - panel.offsetHeight - panelEdgeOffset, 0);
+
         if (panelPosition.left === null) {
             panel.style.left = '';
             panel.style.right = panelPosition.right + 'px';
         } else {
+            panelPosition.left = Math.min(Math.max(panelPosition.left, panelEdgeOffset), maxLeft);
             panel.style.left = panelPosition.left + 'px';
             panel.style.right = 'auto';
         }
+
+        panelPosition.top = Math.min(Math.max(panelPosition.top, panelEdgeOffset), maxTop);
         panel.style.top = panelPosition.top + 'px';
     }
 
     function clampPanelPosition(panel, nextLeft, nextTop) {
-        var maxLeft = Math.max(window.innerWidth - panel.offsetWidth, 0);
-        var maxTop = Math.max(window.innerHeight - panel.offsetHeight, 0);
+        // 拖拽时同样保留边缘间距，不允许完全贴边
+        var maxLeft = Math.max(window.innerWidth - panel.offsetWidth - panelEdgeOffset, 0);
+        var maxTop = Math.max(window.innerHeight - panel.offsetHeight - panelEdgeOffset, 0);
         return {
-            left: Math.min(Math.max(nextLeft, 0), maxLeft),
-            top: Math.min(Math.max(nextTop, 0), maxTop),
+            left: Math.min(Math.max(nextLeft, panelEdgeOffset), maxLeft),
+            top: Math.min(Math.max(nextTop, panelEdgeOffset), maxTop),
         };
     }
 
@@ -389,6 +422,8 @@ function injectGitlabReviewer(config) {
         var panel = ensurePanel();
         var body = panel.querySelector('.doraemon-gitlab-body');
         body.innerHTML = html;
+        // 内容填充后面板高度才最终确定，重新应用一次位置避免 top 越界
+        applyPanelPosition(panel);
         bindScrollTopButtonEvents(panel);
     }
 
@@ -462,14 +497,28 @@ function injectGitlabReviewer(config) {
         chrome.storage.local.get(positionStorageKey, function (result) {
             var saved = result[positionStorageKey];
             if (saved) {
-                if (saved.left !== null && saved.left !== undefined) {
-                    panelPosition.left = saved.left;
+                if (saved.centerXPercent !== undefined && saved.centerYPercent !== undefined) {
+                    // 新格式：中心线百分比（跨屏保持相对位置）
+                    var pixel = panelPositionFromCenterPercent(
+                        saved.centerXPercent,
+                        saved.centerYPercent
+                    );
+                    panelPosition.left = pixel.left;
                     panelPosition.right = null;
-                } else if (saved.right !== undefined) {
-                    panelPosition.right = saved.right;
-                    panelPosition.left = null;
+                    panelPosition.top = pixel.top;
+                } else {
+                    // 旧格式：绝对像素，兼容迁移前的存储
+                    if (saved.left !== null && saved.left !== undefined) {
+                        panelPosition.left = saved.left;
+                        panelPosition.right = null;
+                    } else if (saved.right !== undefined) {
+                        panelPosition.right = saved.right;
+                        panelPosition.left = null;
+                    }
+                    if (saved.top !== undefined) {
+                        panelPosition.top = saved.top;
+                    }
                 }
-                panelPosition.top = saved.top;
             }
 
             doFetchDiscussions();
