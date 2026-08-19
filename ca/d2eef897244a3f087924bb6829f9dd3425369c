@@ -1,0 +1,26 @@
+src/pages/Content/index.js
+  s_a7e5f27575ed65::t_0c5b9508cdbf7c 138-140
+  s_a7e5f27575ed65::t_569f71ca3f6c60 288,290-291,297,302
+  s_a7e5f27575ed65::t_5130016cdf7fce 425-426
+  s_a7e5f27575ed65::t_123687c2da9e79 307-309,311-312
+  s_a7e5f27575ed65::t_81550de92a5b26 500-506,508-520
+  s_a7e5f27575ed65::t_53cdb7175fe68e 289,292,301
+  s_a7e5f27575ed65::t_85cd42a8125917 154-169,171-173,176-178
+  s_a7e5f27575ed65::t_d26ab23ec84cfa 136-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cad2eef897244a3f087924bb6829f9dd3425369c",
+  "prompts": {},
+  "sessions": {
+    "s_a7e5f27575ed65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "18bbcd41-6e70-475b-817d-f5fd1436b0b1",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
