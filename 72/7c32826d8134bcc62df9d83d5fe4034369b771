@@ -1,0 +1,34 @@
+src/pages/Content/devops-login.js
+  s_e6541cefe41516::t_e138101ded7ed0 607
+src/pages/Options/Options.tsx
+  s_fb828ab98065e3::t_c6f07d15e3c496 305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "727c32826d8134bcc62df9d83d5fe4034369b771",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_e6541cefe41516": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b077d505-d6b7-4169-9c58-94487a7686a8",
+        "model": "deepseek-v4-pro-0813"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_fb828ab98065e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4729409-d12e-4c54-8bce-3acf47a6e34d",
+        "model": "unknown"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
