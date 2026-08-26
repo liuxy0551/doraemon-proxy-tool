@@ -302,7 +302,7 @@ const Options: React.FC<IProps> = () => {
                                                                 'autoTriggerDelay',
                                                             ]}
                                                             label="触发延迟(秒)"
-                                                            tooltip="进入登录页面后延迟多少秒自动触发"
+                                                            tooltip="进入登录页面后延迟多少秒自动触发快速登录"
                                                             initialValue={
                                                                 config.quickLogin
                                                                     ?.autoTriggerDelay ??

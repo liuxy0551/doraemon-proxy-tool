@@ -604,7 +604,7 @@
             let countdownToast = null;
             autoTriggerController = createAutoTriggerController({
                 delay,
-                countdownDelay: 1500,
+                countdownDelay: 2000,
                 onCountdown: () => {
                     countdownToast = showToast('即将自动触发快速登录...');
                 },
