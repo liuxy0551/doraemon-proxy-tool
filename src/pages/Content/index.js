@@ -1,4 +1,5 @@
 import { isMatchedHost } from '@/utils/hostMatcher';
+import { DEFAULT_AD_BLOCK_SELECTORS } from '@/const';
 
 chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, allEnvList }) {
     function isSameHostname(urlStr) {
@@ -9,6 +10,91 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
             return false;
         }
     }
+
+    /*
+     * 广告拦截：全局生效（不限于注入匹配地址）。
+     * Google 的 vignette/锚定等广告元素会带内联 !important 样式（如 display:block !important），
+     * 优先级高于样式表，单纯 CSS 隐藏无效，因此从 DOM 直接移除，并用 MutationObserver
+     * 持续清除动态插入的广告。
+     * 无全局开关：选择器全量存于配置 config.adBlockSelectors（内置默认已预填），
+     * 非空即隐藏/移除，清空即完全不拦。
+     */
+    let adBlockSelectors = [...DEFAULT_AD_BLOCK_SELECTORS];
+
+    // 移除指定根节点下的广告元素（含节点自身）。逐个选择器独立执行，
+    // 不合法的选择器仅跳过该条，不影响其他规则。
+    const removeAdNodes = (root) => {
+        adBlockSelectors.forEach((selector) => {
+            try {
+                if (root.matches && root.matches(selector)) {
+                    root.remove();
+                    return;
+                }
+                root.querySelectorAll?.(selector).forEach((node) =>
+                    node.remove()
+                );
+            } catch (e) {
+                // 忽略非法/不支持的 CSS 选择器
+            }
+        });
+    };
+
+    let adBlockObserver = null;
+    let adBlockStyleEl = null;
+
+    const syncAdBlock = (selectors) => {
+        adBlockSelectors =
+            selectors === undefined || selectors === null
+                ? [...DEFAULT_AD_BLOCK_SELECTORS]
+                : (selectors || [])
+                      .map((s) => String(s).trim())
+                      .filter(Boolean);
+        const hasSelectors = adBlockSelectors.length > 0;
+        // CSS 隐藏层由配置选择器动态驱动：输入框清空后不再注入任何隐藏规则
+        const cssText = adBlockSelectors
+            .map((sel) => `${sel} { display: none !important; }`)
+            .join('\n');
+        if (hasSelectors) {
+            if (!adBlockStyleEl) {
+                adBlockStyleEl = document.createElement('style');
+                adBlockStyleEl.id = 'doraemon-adblock-style';
+                document.documentElement.appendChild(adBlockStyleEl);
+            }
+            adBlockStyleEl.textContent = cssText;
+        } else if (adBlockStyleEl) {
+            adBlockStyleEl.remove();
+            adBlockStyleEl = null;
+        }
+        if (hasSelectors) {
+            // 先清一遍已存在的广告节点
+            removeAdNodes(document);
+            // 再持续监听动态插入的广告节点
+            if (!adBlockObserver) {
+                adBlockObserver = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType !== Node.ELEMENT_NODE) return;
+                            removeAdNodes(node);
+                        });
+                    });
+                });
+                adBlockObserver.observe(document.documentElement, {
+                    childList: true,
+                    subtree: true,
+                });
+            }
+        } else if (adBlockObserver) {
+            adBlockObserver.disconnect();
+            adBlockObserver = null;
+        }
+    };
+    syncAdBlock(config?.adBlockSelectors);
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'local') return;
+        if (changes.config?.newValue) {
+            syncAdBlock(changes.config.newValue.adBlockSelectors);
+        }
+    });
 
     // 检测 GitLab MR 页面，添加 AI CodeReview 悬浮面板（内容脚本直接操作 DOM）
     if (

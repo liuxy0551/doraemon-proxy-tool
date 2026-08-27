@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
     Button,
+    Checkbox,
     ConfigProvider,
     Divider,
     Form,
     Input,
     InputNumber,
+    message,
+    Modal,
     Radio,
     Switch,
     Tooltip,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { cloneDeep } from 'lodash';
-import { POPUP_SIZE_TYPE } from '@/const';
+import {
+    POPUP_SIZE_TYPE,
+    DEFAULT_AD_BLOCK_RULES,
+    DEFAULT_AD_BLOCK_SELECTORS,
+} from '@/const';
 import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { getThemeAlgorithm } from '@/utils';
 import './Options.scss';
@@ -21,6 +28,64 @@ interface IProps {}
 const formItemLayout = {
     labelCol: { span: 5 },
     wrapperCol: { span: 19 },
+};
+
+// 多行文本域 <-> string[] 互相转换（广告拦截的自定义规则/选择器按行存储）
+const fromTextAreaValue = (e: any): string[] =>
+    String(e?.target?.value || '')
+        .split('\n')
+        .map((s: string) => s.trim())
+        .filter(Boolean);
+const toTextAreaValue = (value: any): string =>
+    Array.isArray(value) ? value.join('\n') : '';
+
+// 配置缺失时才回退内置默认（用户显式保存的空数组会被保留）
+const resolveListValue = (value: any, fallback: any[]): any[] =>
+    value === undefined || value === null ? fallback : value;
+
+// ---------- 广告元素 DOM 解析 ----------
+
+// 根据根元素特征生成 CSS 选择器建议（id 或 class 组合）
+const suggestSelector = (el: Element | null): string => {
+    if (!el) return '';
+    const tag = el.tagName.toLowerCase();
+    const id = el.getAttribute('id');
+    if (id) return `${tag}#${id}`;
+    const classes = Array.from(el.classList || [])
+        .filter((c) => !/^\d/.test(c) && !/^(clearfix|d-flex|col-\d+)$/.test(c))
+        .slice(0, 3);
+    if (classes.length) return `${tag}.${classes.join('.')}`;
+    return '';
+};
+
+// 解析粘贴的 DOM HTML，提取外部资源域名与元素选择器建议
+const analyzeDomHtml = (
+    html: string
+): { hosts: string[]; selector: string } => {
+    const hosts: string[] = [];
+    const seen = new Set<string>();
+    const doc = new DOMParser().parseFromString(html || '', 'text/html');
+    const collectUrl = (urlStr: string) => {
+        if (!urlStr) return;
+        try {
+            const url = new URL(urlStr, location.href);
+            if (!/^https?:$/.test(url.protocol)) return;
+            if (seen.has(url.hostname)) return;
+            seen.add(url.hostname);
+            hosts.push(url.hostname);
+        } catch (e) {
+            // 忽略无法解析的地址
+        }
+    };
+    doc
+        .querySelectorAll(
+            'script[src], iframe[src], img[src], video[src], source[src], link[href], a[href]'
+        )
+        .forEach((el) => {
+            const urlStr = el.getAttribute('src') || el.getAttribute('href') || '';
+            collectUrl(urlStr);
+        });
+    return { hosts, selector: suggestSelector(doc.body?.firstElementChild) };
 };
 
 const Options: React.FC<IProps> = () => {
@@ -62,6 +127,12 @@ const Options: React.FC<IProps> = () => {
         if ('gitlabReviewEnabled' in changedValues) {
             newConfig.gitlabReviewEnabled = changedValues.gitlabReviewEnabled;
         }
+        if ('adBlockRules' in changedValues) {
+            newConfig.adBlockRules = changedValues.adBlockRules || [];
+        }
+        if ('adBlockSelectors' in changedValues) {
+            newConfig.adBlockSelectors = changedValues.adBlockSelectors || [];
+        }
         if ('quickLogin' in changedValues) {
             newConfig.quickLogin = Object.assign(
                 {},
@@ -74,6 +145,75 @@ const Options: React.FC<IProps> = () => {
         }
         setConfig(newConfig);
         chrome.storage.local.set({ config: newConfig });
+    };
+
+    // 恢复广告拦截内置默认规则（清空输入框后用于一键找回）
+    const handleResetAdBlockDefaults = () => {
+        const newConfig = cloneDeep(config) || ({} as IConfig);
+        newConfig.adBlockRules = [...DEFAULT_AD_BLOCK_RULES];
+        newConfig.adBlockSelectors = [...DEFAULT_AD_BLOCK_SELECTORS];
+        form.setFieldsValue({
+            adBlockRules: newConfig.adBlockRules,
+            adBlockSelectors: newConfig.adBlockSelectors,
+        });
+        setConfig(newConfig);
+        chrome.storage.local.set({ config: newConfig });
+        message.success('已恢复默认广告拦截规则');
+    };
+
+    // ---------- 广告元素 DOM 解析弹窗 ----------
+    const [domParseOpen, setDomParseOpen] = useState(false);
+    const [domHtml, setDomHtml] = useState('');
+    const [checkedHosts, setCheckedHosts] = useState<string[]>([]);
+    const [suggestedSelector, setSuggestedSelector] = useState('');
+
+    // 打开解析弹窗（可带入已粘贴的 HTML）
+    const openDomParse = (html = '') => {
+        setDomHtml(html);
+        setDomParseOpen(true);
+    };
+
+    // DOM HTML 内容变化时重新解析，刷新域名勾选与选择器建议
+    useEffect(() => {
+        if (!domParseOpen) return;
+        const { hosts, selector } = analyzeDomHtml(domHtml);
+        setCheckedHosts(hosts);
+        setSuggestedSelector(selector);
+    }, [domHtml, domParseOpen]);
+
+    // 在规则/选择器输入框粘贴 HTML 时转入解析弹窗，避免污染输入框
+    const handleAdBlockTextAreaPaste = (e: React.ClipboardEvent) => {
+        const text = e.clipboardData?.getData('text/plain') || '';
+        if (text && /<\s*[a-zA-Z][^>]*>/.test(text)) {
+            e.preventDefault();
+            openDomParse(text);
+        }
+    };
+
+    // 确认：把勾选的域名与选择器写入配置并保存
+    const confirmDomParse = () => {
+        const newConfig = cloneDeep(config) || ({} as IConfig);
+        const rules = new Set<string>(newConfig.adBlockRules || []);
+        checkedHosts.forEach((host) => {
+            if (host) rules.add(`||${host}^`);
+        });
+        newConfig.adBlockRules = [...rules];
+        const selector = (suggestedSelector || '').trim();
+        if (selector) {
+            const selectors = new Set<string>(
+                newConfig.adBlockSelectors || []
+            );
+            selectors.add(selector);
+            newConfig.adBlockSelectors = [...selectors];
+        }
+        form.setFieldsValue({
+            adBlockRules: newConfig.adBlockRules,
+            adBlockSelectors: newConfig.adBlockSelectors,
+        });
+        setConfig(newConfig);
+        chrome.storage.local.set({ config: newConfig });
+        setDomParseOpen(false);
+        message.success('已添加广告拦截规则');
     };
 
     useEffect(() => {
@@ -419,8 +559,160 @@ const Options: React.FC<IProps> = () => {
                                 <Switch />
                             </Form.Item>
                         </div>
+                        <div className="option-item">
+                            <div className="option-title" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                广告拦截
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={() => openDomParse()}
+                                >
+                                    DOM解析
+                                </Button>
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={handleResetAdBlockDefaults}
+                                >
+                                    恢复默认
+                                </Button>
+                            </div>
+                            <Form.Item
+                                name="adBlockRules"
+                                label="拦截规则"
+                                tooltip={
+                                    <span>
+                                        无全局开关，请求级拦截与否完全由下方输入框内容决定
+                                        <br />
+                                        每行一条、完整生效。内置默认已预填，可增删改
+                                        <br />
+                                        纯域名自动匹配任意子域，也可写完整 DNR urlFilter，例如：
+                                        <code>example.com</code> / <code>*://*.ads.io/*</code> /{' '}
+                                        <code>||advert.com^</code>
+                                        <br />
+                                        清空表示不进行请求级拦截，想找回初始规则可点标题旁「恢复默认」
+                                    </span>
+                                }
+                                initialValue={resolveListValue(
+                                    config.adBlockRules,
+                                    DEFAULT_AD_BLOCK_RULES
+                                )}
+                                getValueFromEvent={fromTextAreaValue}
+                                getValueProps={(value) => ({
+                                    value: toTextAreaValue(value),
+                                })}
+                            >
+                                <Input.TextArea
+                                    rows={3}
+                                    onPaste={handleAdBlockTextAreaPaste}
+                                    placeholder={'每行一条，如：example.com 或 ||wwads.cn^'}
+                                />
+                            </Form.Item>
+                            <Form.Item
+                                name="adBlockSelectors"
+                                label="广告元素选择器"
+                                tooltip={
+                                    <span>
+                                        每行一条、完整生效。内置默认已预填，可增删改
+                                        <br />
+                                        CSS 选择器命中即从页面移除，例如：
+                                        <code>.ad-banner</code> 或 <code>#ads-wrap</code>
+                                        <br />
+                                        清空表示不从页面移除元素
+                                    </span>
+                                }
+                                initialValue={resolveListValue(
+                                    config.adBlockSelectors,
+                                    DEFAULT_AD_BLOCK_SELECTORS
+                                )}
+                                getValueFromEvent={fromTextAreaValue}
+                                getValueProps={(value) => ({
+                                    value: toTextAreaValue(value),
+                                })}
+                            >
+                                <Input.TextArea
+                                    rows={3}
+                                    onPaste={handleAdBlockTextAreaPaste}
+                                    placeholder={'每行一条，如：.ad-banner 或 #ads-wrap'}
+                                />
+                            </Form.Item>
+                        </div>
                     </Form>
                 )}
+
+                <Modal
+                    title="从广告元素 DOM 解析拦截规则"
+                    open={domParseOpen}
+                    onCancel={() => setDomParseOpen(false)}
+                    onOk={confirmDomParse}
+                    okText="添加到规则"
+                    cancelText="取消"
+                    width={560}
+                >
+                    <div
+                        style={{
+                            marginBottom: 8,
+                            color: '#888',
+                            fontSize: 12,
+                        }}
+                    >
+                        在 F12 元素面板右键广告元素 → Copy → Copy outerHTML，粘贴到下面：
+                    </div>
+                    <Input.TextArea
+                        rows={5}
+                        value={domHtml}
+                        onChange={(e) => setDomHtml(e.target.value)}
+                        placeholder={'粘贴广告元素的 HTML，如 <div class="wwads-cn">'}
+                    />
+                    {checkedHosts.length > 0 && (
+                        <>
+                            <div
+                                style={{
+                                    margin: '12px 0 6px',
+                                    color: '#555',
+                                    fontSize: 13,
+                                }}
+                            >
+                                识别到的外部域名（勾选后生成请求拦截规则）
+                            </div>
+                            <Checkbox.Group
+                                options={checkedHosts.map((host) => ({
+                                    label: host,
+                                    value: host,
+                                }))}
+                                value={checkedHosts}
+                                onChange={(values) =>
+                                    setCheckedHosts(values as string[])
+                                }
+                            />
+                        </>
+                    )}
+                    {suggestedSelector && (
+                        <>
+                            <div
+                                style={{
+                                    margin: '12px 0 6px',
+                                    color: '#555',
+                                    fontSize: 13,
+                                }}
+                            >
+                                自动生成的选择器（可编辑，留空则不添加）
+                            </div>
+                            <Input
+                                value={suggestedSelector}
+                                onChange={(e) =>
+                                    setSuggestedSelector(e.target.value)
+                                }
+                                placeholder="CSS 选择器，如 .wwads-cn"
+                            />
+                        </>
+                    )}
+                    {!checkedHosts.length && !suggestedSelector && (
+                        <div style={{ marginTop: 12, color: '#999' }}>
+                            未识别到外部资源域名与元素特征，可手动在下方输入选择器
+                        </div>
+                    )}
+                </Modal>
             </div>
         </ConfigProvider>
     );

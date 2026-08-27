@@ -12,7 +12,7 @@
         "16": "icon-16.png",
         "128": "icon-128.png"
     },
-    "permissions": ["storage", "tabs", "contextMenus"],
+    "permissions": ["storage", "tabs", "contextMenus", "declarativeNetRequest"],
     "host_permissions": ["<all_urls>"],
     "content_scripts": [
         {

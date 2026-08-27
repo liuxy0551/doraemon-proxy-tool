@@ -45,6 +45,11 @@ interface IConfig {
         ocrApiUrl: string;
     };
     gitlabReviewEnabled: boolean;
+    /** 广告拦截规则（DNR urlFilter，纯域名自动匹配任意子域）。
+     *  无全局开关，拦截与否完全由输入框内容决定：列表非空即拦截，清空即不拦截 */
+    adBlockRules: string[];
+    /** 自定义页面广告元素选择器（CSS selector，每行一条） */
+    adBlockSelectors: string[];
 }
 
 interface IStorageCache {
