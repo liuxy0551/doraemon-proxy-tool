@@ -1,0 +1,19 @@
+.github/workflows/build.yml
+  s_e96cf903127fbd::t_b37987b3955fd6 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "06a10f947a85c915d7eabf4a644fa7a5371a0bcf",
+  "prompts": {},
+  "sessions": {
+    "s_e96cf903127fbd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316ccdab-1c5a-4d90-94b3-5b3922c23b43",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
