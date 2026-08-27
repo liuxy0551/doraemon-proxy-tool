@@ -1,14 +1,37 @@
 src/pages/Options/Options.scss
   s_e96cf903127fbd::t_de33c76a2a83d1 40-91
+  s_e6541cefe41516::t_af3acd84715b01 40-53,71-91
+  s_e6541cefe41516::t_fc7f1f5c2d35ac 54,56-60,69-70
+  s_e6541cefe41516::t_4a84bd6610f040 61-62,64-68
+  s_e6541cefe41516::t_4c6dde61528c78 55
+  s_e6541cefe41516::t_b6583cf12f9be4 63
 src/pages/Options/Options.tsx
   s_e96cf903127fbd::t_982c6c0638c7c7 4,260,264,270,303-304,370-371,382,470,499,513,525,531-532,536-537,544-545,572,600,605-621
+  s_e6541cefe41516::t_dde6d1759c3484 4,260,264,270,303-304,370-371,470,499,513,525,531-532,544,621
+  h_0c940a947252a6 382,536-537
+  s_e6541cefe41516::t_16f9e500e6aa27 545
+  s_e6541cefe41516::t_fe87c8ee1f19f1 618-620
+  s_e6541cefe41516::t_d1f234bd2fb86f 572,600,605-617
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.7.0",
   "base_commit_sha": "ea88ab5e1e2237fa8b7c96e15aa7dc34dee42eff",
   "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
   "sessions": {
+    "s_e6541cefe41516": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b077d505-d6b7-4169-9c58-94487a7686a8",
+        "model": "deepseek-v4-pro-0813"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
     "s_e96cf903127fbd": {
       "agent_id": {
         "tool": "claude",
