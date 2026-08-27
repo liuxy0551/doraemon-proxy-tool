@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     Button,
+    Card,
     Checkbox,
     ConfigProvider,
     Divider,
@@ -256,21 +257,17 @@ const Options: React.FC<IProps> = () => {
                     <Form
                         form={form}
                         {...formItemLayout}
-                        style={{ width: '60%', minWidth: 650 }}
+                        className="options-form"
                         onValuesChange={handleFormChange}
                         preserve={false}
                     >
-                        <div className="option-item">
-                            <div className="option-title">IP设置</div>
+                        <Card title="IP设置" className="option-card option-card--ip">
                             <Form.Item
                                 name="ip"
                                 label="当前ip地址"
                                 initialValue={ip}
                             >
-                                <Input
-                                    style={{ width: 250 }}
-                                    disabled={config.ipGetMode === 'auto'}
-                                />
+                                <Input disabled={config.ipGetMode === 'auto'} />
                             </Form.Item>
                             <Form.Item
                                 name="ipGetMode"
@@ -303,9 +300,8 @@ const Options: React.FC<IProps> = () => {
                                     </Radio>
                                 </Radio.Group>
                             </Form.Item>
-                        </div>
-                        <div className="option-item">
-                            <div className="option-title">外观</div>
+                        </Card>
+                        <Card title="外观" className="option-card option-card--appearance">
                             <Form.Item
                                 name={['size', 'type']}
                                 label="Popup大小"
@@ -371,9 +367,8 @@ const Options: React.FC<IProps> = () => {
                                     <Radio value="auto">跟随系统</Radio>
                                 </Radio.Group>
                             </Form.Item>
-                        </div>
-                        <div className="option-item">
-                            <div className="option-title">集成登录</div>
+                        </Card>
+                        <Card title="集成登录" className="option-card option-card--login">
                             <Form.Item
                                 name="matchUrls"
                                 label="注入匹配地址"
@@ -384,7 +379,7 @@ const Options: React.FC<IProps> = () => {
                             </Form.Item>
                             <Form.Item
                                 name="devopsInjectEnabled"
-                                label="devops/OMP注入(前端专用)"
+                                label="OMP注入(前端专用)"
                                 tooltip="开启后会重写本地开发环境（域名dev.或local.开头）的config文件，接管跳转地址至线上环境"
                                 initialValue={config.devopsInjectEnabled}
                                 valuePropName="checked"
@@ -472,10 +467,7 @@ const Options: React.FC<IProps> = () => {
                                                     config.quickLogin?.username
                                                 }
                                             >
-                                                <Input
-                                                    placeholder="请输入用户名"
-                                                    style={{ width: 316 }}
-                                                />
+                                                <Input placeholder="请输入用户名" />
                                             </Form.Item>
                                             <Form.Item
                                                 name={[
@@ -490,7 +482,6 @@ const Options: React.FC<IProps> = () => {
                                                 <Input
                                                     placeholder="请输入密码"
                                                     type="password"
-                                                    style={{ width: 316 }}
                                                 />
                                             </Form.Item>
                                             <Form.Item
@@ -505,10 +496,7 @@ const Options: React.FC<IProps> = () => {
                                                         ?.jumpProductPath
                                                 }
                                             >
-                                                <Input
-                                                    placeholder="请输入登录后跳转地址"
-                                                    style={{ width: 316 }}
-                                                />
+                                                <Input placeholder="请输入登录后跳转地址" />
                                             </Form.Item>
                                             <Form.Item
                                                 name={[
@@ -522,10 +510,7 @@ const Options: React.FC<IProps> = () => {
                                                         ?.defaultTenantId
                                                 }
                                             >
-                                                <Input
-                                                    placeholder="请输入默认进入的租户id"
-                                                    style={{ width: 316 }}
-                                                />
+                                                <Input placeholder="请输入默认进入的租户id" />
                                             </Form.Item>
                                             <Form.Item
                                                 name={[
@@ -537,46 +522,27 @@ const Options: React.FC<IProps> = () => {
                                                     config.quickLogin?.ocrApiUrl
                                                 }
                                             >
-                                                <Input
-                                                    placeholder="请输入验证码 OCR 接口地址"
-                                                    style={{ width: 316 }}
-                                                />
+                                                <Input placeholder="请输入验证码 OCR 接口地址" />
                                             </Form.Item>
                                         </>
                                     )
                                 }
                             </Form.Item>
-                        </div>
-                        <div className="option-item">
-                            <div className="option-title">GitLab CodeReview</div>
+                        </Card>
+                        <Card title="GitLab CodeReview" className="option-card option-card--gitlab">
                             <Form.Item
                                 name="gitlabReviewEnabled"
                                 label="AI CodeReview 悬浮面板"
+                                labelCol={{ span: 6 }}
+                                wrapperCol={{ span: 18 }}
                                 tooltip="在 GitLab MR 页面右上角展示 Front-Gitlab-AI-CodeReviewer 的评论列表和评分"
                                 initialValue={config.gitlabReviewEnabled !== false}
                                 valuePropName="checked"
                             >
                                 <Switch />
                             </Form.Item>
-                        </div>
-                        <div className="option-item">
-                            <div className="option-title" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                广告拦截
-                                <Button
-                                    type="link"
-                                    size="small"
-                                    onClick={() => openDomParse()}
-                                >
-                                    DOM解析
-                                </Button>
-                                <Button
-                                    type="link"
-                                    size="small"
-                                    onClick={handleResetAdBlockDefaults}
-                                >
-                                    恢复默认
-                                </Button>
-                            </div>
+                        </Card>
+                        <Card title="广告拦截" className="option-card option-card--adblock">
                             <Form.Item
                                 name="adBlockRules"
                                 label="拦截规则"
@@ -603,7 +569,7 @@ const Options: React.FC<IProps> = () => {
                                 })}
                             >
                                 <Input.TextArea
-                                    rows={3}
+                                    rows={8}
                                     onPaste={handleAdBlockTextAreaPaste}
                                     placeholder={'每行一条，如：example.com 或 ||wwads.cn^'}
                                 />
@@ -631,12 +597,28 @@ const Options: React.FC<IProps> = () => {
                                 })}
                             >
                                 <Input.TextArea
-                                    rows={3}
+                                    rows={8}
                                     onPaste={handleAdBlockTextAreaPaste}
                                     placeholder={'每行一条，如：.ad-banner 或 #ads-wrap'}
                                 />
                             </Form.Item>
-                        </div>
+                            <div className="ad-block-actions">
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={() => openDomParse()}
+                                >
+                                    DOM解析
+                                </Button>
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={handleResetAdBlockDefaults}
+                                >
+                                    恢复默认
+                                </Button>
+                            </div>
+                        </Card>
                     </Form>
                 )}
 

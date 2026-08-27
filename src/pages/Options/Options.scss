@@ -37,3 +37,55 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+
+.options-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        'ip login'
+        'appearance login'
+        'gitlab login'
+        'adblock login';
+    gap: 16px;
+    align-items: start;
+}
+
+.option-card {
+    transition: box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    // 统一输入框与文本域宽度（InputNumber 使用 .ant-input-number 类，不受影响）
+    .ant-input {
+        width: 480px;
+    }
+
+    // 文本域高度设为 7.5 行，最后一行露出半行，暗示下方还有内容可滚动
+    textarea.ant-input {
+        height: 175px;
+    }
+
+    &--ip {
+        grid-area: ip;
+    }
+    &--appearance {
+        grid-area: appearance;
+    }
+    &--gitlab {
+        grid-area: gitlab;
+    }
+    &--login {
+        grid-area: login;
+    }
+    &--adblock {
+        grid-area: adblock;
+    }
+}
+
+.ad-block-actions {
+    display: flex;
+    gap: 8px;
+}
