@@ -1,0 +1,85 @@
+src/manifest.json
+  s_fb828ab98065e3::t_cd1ae54c5b5c26 15
+src/pages/Background/index.ts
+  s_fb828ab98065e3::t_5bcf3604f4f752 318
+  s_fb828ab98065e3::t_32b7fb9ea36833 308
+  s_fb828ab98065e3::t_2d0d52e3ea04c6 297-298
+  s_fb828ab98065e3::t_df258557fc08e1 288-289
+  s_fb828ab98065e3::t_d6064eed29c1ee 2-7
+  s_fb828ab98065e3::t_ae97755ba8b523 176-177,179-180,182-183,185-189,191-193,197,206,223-224,227
+  s_fb828ab98065e3::t_c81f641716e23f 194-196,198-205,207-219,222,225
+  s_fb828ab98065e3::t_ee33b05b80643b 175,178,181,184,190,226,229-231
+  s_fb828ab98065e3::t_1344225a136fd5 54-59,64
+  s_fb828ab98065e3::t_06b90da3c2a948 257
+  s_fb828ab98065e3::t_177553fc622dd6 307
+  s_fb828ab98065e3::t_c25ead23931799 220-221,228
+  s_fb828ab98065e3::t_6d0b6d387b507f 290
+  s_fb828ab98065e3::t_bab9f7648c8f9b 258-263
+  s_fb828ab98065e3::t_e8bc80b128f6fc 46-50,65,68-70
+  s_fb828ab98065e3::t_b5c124eab631ae 316-317
+  s_fb828ab98065e3::t_0d555cd8288763 51-53,60-63
+  s_fb828ab98065e3::t_49d6dcfc83329d 313-315,319-320
+  s_fb828ab98065e3::t_beffccfecbbf7d 321
+src/pages/Options/Options.tsx
+  s_fb828ab98065e3::t_c80e9a170935c2 10
+  s_e6541cefe41516::t_dde6d1759c3484 568,596,606-607,632,660,665-681
+  s_fb828ab98065e3::t_e121171fcccfaa 33-41
+  s_fb828ab98065e3::t_94e64d837c3ec2 4,11
+  s_fb828ab98065e3::t_06c741d7b40124 608
+  s_fb828ab98065e3::t_6d41522ae2cfb4 631,634-635,646-647,659,662-663
+  s_fb828ab98065e3::t_fb15aac0e14c4f 130-135
+  s_fb828ab98065e3::t_69130ce0a007f2 150-163
+  s_fb828ab98065e3::t_544f742ddbc65e 707
+  s_fb828ab98065e3::t_9e1d7dd56f23d9 604-605,609,611-612,616,619-621,626-630,636-638,643,648-649,654-658
+  s_fb828ab98065e3::t_1a33ed383cf3a6 164-216,218
+  s_fb828ab98065e3::t_c8e5657fc691a0 46-90
+  s_fb828ab98065e3::t_9d2fefb6b7d25c 610,615,617-618,622-625,639,642,644-645,650-653
+  s_fb828ab98065e3::t_a12ab5b6b32bdb 42-45
+  s_fb828ab98065e3::t_8c4952b16d0c82 613-614
+  s_fb828ab98065e3::t_5ea8456398c9ae 633
+  s_fb828ab98065e3::t_fe49f6af3ae3a5 587,661,684-706,708-715
+  s_fb828ab98065e3::t_4b9372f298e5ab 18-22
+  s_e6541cefe41516::t_d4ffe6db6a9c3d 217,562-567,569-586,588-595,597-603,664,682-683
+src/const.ts
+  s_fb828ab98065e3::t_16a0b6953c42d9 19-44
+src/typings/index.d.ts
+  s_fb828ab98065e3::t_7d2159d277f55d 50-52
+  s_fb828ab98065e3::t_304f79584e2039 48-49
+src/pages/Content/index.js
+  s_fb828ab98065e3::t_439ba6b1ed58bb 90,92-94,96-97
+  s_fb828ab98065e3::t_db1e8ad7b2be80 2
+  s_fb828ab98065e3::t_daf4956443ef51 43,53-54,56,58-67
+  s_fb828ab98065e3::t_201750e79f5981 14-18,21,23,26,40-42,44,69-89
+  s_fb828ab98065e3::t_13ad9e54a422e5 91,95
+  s_fb828ab98065e3::t_34624e1f60df49 22,25,46-51
+  s_fb828ab98065e3::t_d0ebde9148bd29 45,52,55,57,68
+  s_fb828ab98065e3::t_1b30ac801b8d70 19-20
+  s_fb828ab98065e3::t_420c57056c403b 24,27-39
+  s_fb828ab98065e3::t_6c2448f98ab35b 98
+src/pages/Content/content.styles.css
+  s_fb828ab98065e3::t_9f3e148f4c4230 363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "cc35c88dfbccb29450eb9838550c1730220b67d7",
+  "prompts": {},
+  "sessions": {
+    "s_e6541cefe41516": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b077d505-d6b7-4169-9c58-94487a7686a8",
+        "model": "deepseek-v4-pro-0813"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_fb828ab98065e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4729409-d12e-4c54-8bce-3acf47a6e34d",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
