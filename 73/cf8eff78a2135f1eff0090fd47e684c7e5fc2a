@@ -1,0 +1,39 @@
+README.md
+  s_e96cf903127fbd::t_e30432bfa59d11 26
+  s_e96cf903127fbd::t_00f8acd958f6e9 21
+.github/workflows/build.yml
+  s_a5af598d94009e::t_ffcff5556e220d 31
+.gitignore
+  s_e96cf903127fbd::t_6cd7bb114a5f75 9
+scripts/repack.js
+  s_e96cf903127fbd::t_24e3f781cb6cf1 8-9,11-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "73cf8eff78a2135f1eff0090fd47e684c7e5fc2a",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_a5af598d94009e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6ddd-c652-7390-95f9-be88e4ec9da5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_e96cf903127fbd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316ccdab-1c5a-4d90-94b3-5b3922c23b43",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
