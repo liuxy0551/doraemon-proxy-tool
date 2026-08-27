@@ -18,12 +18,12 @@ pnpm install
 pnpm build
 ```
 
-可选：根据版本语义化重新命名文件夹
+可选：重命名文件夹并打包
 ```
 pnpm pack
 ```
 
-3. 浏览器加载扩展程序选择 doraemon-proxy-tool-xxx 文件夹
+3. 浏览器加载扩展程序选择 doraemon-proxy-tool 文件夹
 
 ### 或者直接下载打包好的扩展程序
 

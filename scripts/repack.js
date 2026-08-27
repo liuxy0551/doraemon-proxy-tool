@@ -2,26 +2,14 @@ const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 
-const packageJsonPath = path.join(__dirname, '../package.json');
-const packageData = require(packageJsonPath);
-
-const version = packageData.version;
-if (!version) {
-    console.error('未在 package.json 中找到版本号！');
-    process.exit(1);
-}
-
 // 源文件夹路径
 const sourceFolder = path.join(__dirname, '../build');
 
-// 目标文件夹路径（包含版本号）
-const targetFolder = path.join(__dirname, `../doraemon-proxy-tool-v${version}`);
+// 目标文件夹路径
+const targetFolder = path.join(__dirname, '../doraemon-proxy-tool');
 
-// 打包后的目标文件（包含版本号）
-const zipFilePath = path.join(
-    __dirname,
-    `../doraemon-proxy-tool-v${version}.zip`
-);
+// 打包后的目标文件
+const zipFilePath = path.join(__dirname, '../doraemon-proxy-tool.zip');
 
 async function copyAndRenameFolder() {
     try {

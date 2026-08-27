@@ -165,6 +165,7 @@ const Options: React.FC<IProps> = () => {
     // ---------- 广告元素 DOM 解析弹窗 ----------
     const [domParseOpen, setDomParseOpen] = useState(false);
     const [domHtml, setDomHtml] = useState('');
+    const [discoveredHosts, setDiscoveredHosts] = useState<string[]>([]);
     const [checkedHosts, setCheckedHosts] = useState<string[]>([]);
     const [suggestedSelector, setSuggestedSelector] = useState('');
 
@@ -178,6 +179,7 @@ const Options: React.FC<IProps> = () => {
     useEffect(() => {
         if (!domParseOpen) return;
         const { hosts, selector } = analyzeDomHtml(domHtml);
+        setDiscoveredHosts(hosts);
         setCheckedHosts(hosts);
         setSuggestedSelector(selector);
     }, [domHtml, domParseOpen]);
@@ -646,7 +648,7 @@ const Options: React.FC<IProps> = () => {
                         onChange={(e) => setDomHtml(e.target.value)}
                         placeholder={'粘贴广告元素的 HTML，如 <div class="wwads-cn">'}
                     />
-                    {checkedHosts.length > 0 && (
+                    {discoveredHosts.length > 0 && (
                         <>
                             <div
                                 style={{
@@ -658,7 +660,7 @@ const Options: React.FC<IProps> = () => {
                                 识别到的外部域名（勾选后生成请求拦截规则）
                             </div>
                             <Checkbox.Group
-                                options={checkedHosts.map((host) => ({
+                                options={discoveredHosts.map((host) => ({
                                     label: host,
                                     value: host,
                                 }))}
@@ -689,7 +691,7 @@ const Options: React.FC<IProps> = () => {
                             />
                         </>
                     )}
-                    {!checkedHosts.length && !suggestedSelector && (
+                    {!discoveredHosts.length && !suggestedSelector && (
                         <div style={{ marginTop: 12, color: '#999' }}>
                             未识别到外部资源域名与元素特征，可手动在下方输入选择器
                         </div>

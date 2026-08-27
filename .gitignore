@@ -6,7 +6,7 @@
 *.zip
 # production
 /build
-/doraemon-proxy-tool-*
+/doraemon-proxy-tool*
 
 # misc
 .DS_Store
