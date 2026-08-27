@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.8.2...v1.9.0) (2026-08-27)
+
+
+### Features
+
+* add ad blocking support ([cc35c88](https://github.com/liuxy0551/doraemon-proxy-tool/commit/cc35c88dfbccb29450eb9838550c1730220b67d7))
+
+
+### Bug Fixes
+
+* extend auto login countdown delay ([727c328](https://github.com/liuxy0551/doraemon-proxy-tool/commit/727c32826d8134bcc62df9d83d5fe4034369b771))
+
 ### [1.8.2](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.8.1...v1.8.2) (2026-08-19)
 
 
