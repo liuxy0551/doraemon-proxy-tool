@@ -1,0 +1,29 @@
+.gitignore
+  s_e96cf903127fbd::t_6cd7bb114a5f75 9
+README.md
+  s_e96cf903127fbd::t_00f8acd958f6e9 21
+  s_e96cf903127fbd::t_e30432bfa59d11 26
+scripts/repack.js
+  s_e96cf903127fbd::t_24e3f781cb6cf1 8-9,11-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "820d397708a4fbf996c027935ce476dfda652eba",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_e96cf903127fbd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316ccdab-1c5a-4d90-94b3-5b3922c23b43",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
