@@ -1,0 +1,58 @@
+src/pages/Options/Options.tsx
+  s_e6541cefe41516::t_dde6d1759c3484 651,663
+  s_fb828ab98065e3::t_fe49f6af3ae3a5 694
+README.md
+  s_e96cf903127fbd::t_e30432bfa59d11 26
+  s_e96cf903127fbd::t_00f8acd958f6e9 21
+scripts/repack.js
+  s_e96cf903127fbd::t_24e3f781cb6cf1 8-9,11-12
+.github/workflows/build.yml
+  s_a5af598d94009e::t_ffcff5556e220d 31
+.gitignore
+  s_e96cf903127fbd::t_6cd7bb114a5f75 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9df9ee32f22749641c69e41cafea00c520a8e47d",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_a5af598d94009e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6ddd-c652-7390-95f9-be88e4ec9da5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_e6541cefe41516": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b077d505-d6b7-4169-9c58-94487a7686a8",
+        "model": "deepseek-v4-pro-0813"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_e96cf903127fbd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316ccdab-1c5a-4d90-94b3-5b3922c23b43",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_fb828ab98065e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4729409-d12e-4c54-8bce-3acf47a6e34d",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
