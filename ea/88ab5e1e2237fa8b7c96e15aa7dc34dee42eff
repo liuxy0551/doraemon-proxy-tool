@@ -1,0 +1,21 @@
+src/pages/Options/Options.scss
+  s_e96cf903127fbd::t_de33c76a2a83d1 40-91
+src/pages/Options/Options.tsx
+  s_e96cf903127fbd::t_982c6c0638c7c7 4,260,264,270,303-304,370-371,382,470,499,513,525,531-532,536-537,544-545,572,600,605-621
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ea88ab5e1e2237fa8b7c96e15aa7dc34dee42eff",
+  "prompts": {},
+  "sessions": {
+    "s_e96cf903127fbd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316ccdab-1c5a-4d90-94b3-5b3922c23b43",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
