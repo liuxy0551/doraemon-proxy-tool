@@ -513,12 +513,6 @@ function injectGitlabReviewer(config) {
         bindScrollTopButtonEvents(panel);
     }
 
-    function renderLoadingPanel() {
-        setPanelContent(
-            '<div class="doraemon-gitlab-status">正在读取 AI Review 记录...</div>'
-        );
-    }
-
     function renderErrorPanel(message) {
         setPanelContent(
             '<div class="doraemon-gitlab-status doraemon-gitlab-status-error">' +
@@ -625,8 +619,8 @@ function injectGitlabReviewer(config) {
             headers['X-CSRF-Token'] = csrfToken;
         }
 
-        renderLoadingPanel();
-
+        // 不预创建 loading 面板：无 AI Review 记录（历史 MR）时全程不展示浮框，
+        // 避免"先出现再隐藏"的闪烁，确认有记录后才由 renderFloatingPanel 创建面板
         fetch(discussionsUrl, {
             credentials: 'same-origin',
             headers: headers,
@@ -664,6 +658,10 @@ function injectGitlabReviewer(config) {
                 }
 
                 cachedNotes = reviewerNotes;
+                if (reviewerNotes.length === 0) {
+                    // 历史 MR 没有 AI Review 记录，不展示浮框
+                    return;
+                }
                 renderFloatingPanel(reviewerNotes);
             })
             .catch(function (err) {
@@ -675,7 +673,8 @@ function injectGitlabReviewer(config) {
     function restorePanelIfNeeded() {
         if (document.getElementById(panelId)) return;
         if (!/\/-\/merge_requests\/\d+/.test(location.pathname)) return;
-        if (cachedNotes) {
+        // 只有存在 AI Review 记录时才恢复面板；空记录（历史 MR）不展示
+        if (cachedNotes && cachedNotes.length > 0) {
             renderFloatingPanel(cachedNotes);
         }
     }
