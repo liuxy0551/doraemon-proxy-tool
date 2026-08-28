@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.1](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.0...v1.9.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* hide GitLab AI review panel when no review records exist ([67a7a27](https://github.com/liuxy0551/doraemon-proxy-tool/commit/67a7a27c95126f73ec8d05eb27f05f82a57b9d85))
+
 ## [1.9.0](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.8.2...v1.9.0) (2026-08-27)
 
 
