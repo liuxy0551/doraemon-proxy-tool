@@ -1,0 +1,19 @@
+src/pages/Background/index.ts
+  s_43b12b40a2d3b1::t_7c5d5a4c2fc16a 245
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e3a867bb11fd482e25d7bf3e0da330c12e7d64c8",
+  "prompts": {},
+  "sessions": {
+    "s_43b12b40a2d3b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd5470ca-0db1-48c7-b74b-7b7a058e18f7",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
