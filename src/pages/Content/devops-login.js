@@ -497,10 +497,21 @@
             return;
         }
 
-        simulate(usernameInput, username);
-        simulate(passwordInput, password);
+        // 用户名、密码已有内容时不覆盖
+        if (!usernameInput.value) {
+            simulate(usernameInput, username);
+        }
+        if (!passwordInput.value) {
+            simulate(passwordInput, password);
+        }
 
         if (captchaInput) {
+            // 输入框已有验证码时先刷新，避免旧图对应的验证码已失效
+            if (captchaInput.value) {
+                const captchaImage = getCaptchaImage();
+                captchaImage?.click();
+                await sleep(500);
+            }
             const { code } = await recognizeCaptchaCode(ocrApiUrl);
             simulate(captchaInput, code);
         }
