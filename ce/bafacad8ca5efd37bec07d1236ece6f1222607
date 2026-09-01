@@ -1,0 +1,20 @@
+src/pages/Content/devops-login.js
+  s_43b12b40a2d3b1::t_ff0bc895b8123d 509-514
+  s_43b12b40a2d3b1::t_18f81614323925 500-506
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "cebafacad8ca5efd37bec07d1236ece6f1222607",
+  "prompts": {},
+  "sessions": {
+    "s_43b12b40a2d3b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd5470ca-0db1-48c7-b74b-7b7a058e18f7",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
