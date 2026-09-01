@@ -242,7 +242,7 @@ export const initStorage: IStorageCache = {
         theme: 'auto', // light, dark, auto
         devopsInjectEnabled: true, // 是否开启devops开发环境代码注入
         matchUrls:
-            '(.dtstack.cn$|172\\.16\\.)', // 代码注入匹配规则
+            '(^|\\.)(dtstack\\.cn|dtstack\\.com)$|^172\\.16\\.', // 代码注入匹配规则（仅匹配hostname：dtstack域名或172.16内网IP）
         quickLogin: {
             enabled: true,
             autoTrigger: true,
