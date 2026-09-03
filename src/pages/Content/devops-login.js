@@ -128,6 +128,8 @@
             shouldCancelAutoTrigger,
             bindAutoTriggerCancellation,
             updateAutoTriggerCancellationToast,
+            getDefaultJumpUrl,
+            isPortalSubdomainOrigin,
         };
     }
 
@@ -171,6 +173,29 @@
         return aGET;
     }
 
+    // 判断 target 是否为当前站点的独立 portal 子域（如 xxx.k8s.dtstack.cn -> xxx-portal.k8s.dtstack.cn）
+    // 仅在站点名（host 首段）末尾追加 '-portal'，scheme 与端口需一致，避免误放行其它子域
+    function isPortalSubdomainOrigin(targetOrigin, baseOrigin) {
+        try {
+            const target = new URL(targetOrigin);
+            const base = new URL(baseOrigin);
+            if (
+                target.protocol !== base.protocol ||
+                target.port !== base.port
+            ) {
+                return false;
+            }
+            // 首段加 -portal 后缀，如 shuzhan53-lzlj-update -> shuzhan53-lzlj-update-portal，
+            // 其余标签（k8s.dtstack.cn 等）保持不变
+            return (
+                target.host ===
+                base.host.replace(/^([^.]+)/, '$1-portal')
+            );
+        } catch (error) {
+            return false;
+        }
+    }
+
     function getDefaultJumpUrl(defaultJumpPath) {
         const fallbackUrl = new URL('/portal', window.location.origin);
         const defaultJumpPathText = String(defaultJumpPath || '').trim();
@@ -179,14 +204,16 @@
         // DEFAULT_JUMP_PATH 出现 http:/console 这类少一个斜杠的协议写法时直接判无效
         if (/^https?:\/(?!\/)/i.test(defaultJumpPathText)) return fallbackUrl;
 
+        const currentOrigin = window.location.origin;
         try {
-            const defaultJumpUrl = new URL(
-                defaultJumpPathText,
-                window.location.origin
-            );
+            const defaultJumpUrl = new URL(defaultJumpPathText, currentOrigin);
             // 只允许当前站点内跳转，避免 console/publicService 被错误解析成 host
-            if (defaultJumpUrl.origin !== window.location.origin) {
-                return fallbackUrl;
+            if (defaultJumpUrl.origin !== currentOrigin) {
+                // 兼容 https://xxx.k8s.dtstack.cn -> https://xxx-portal.k8s.dtstack.cn
+                // 这类独立 portal 子域的默认跳转地址，否则会一律回退到当前站点 /portal
+                if (!isPortalSubdomainOrigin(defaultJumpUrl, currentOrigin)) {
+                    return fallbackUrl;
+                }
             }
             return defaultJumpUrl;
         } catch (error) {
