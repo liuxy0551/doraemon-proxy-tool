@@ -537,7 +537,7 @@ const Options: React.FC<IProps> = () => {
                                 label="AI CodeReview 悬浮面板"
                                 labelCol={{ span: 6 }}
                                 wrapperCol={{ span: 18 }}
-                                tooltip="在 GitLab MR 页面右上角展示 Front-Gitlab-AI-CodeReviewer 的评论列表和评分"
+                                tooltip="在 GitLab MR 页面右上角展示 AI 评审账号的评论列表和评分（识别含总分内容的 ai/bot 账号评论）"
                                 initialValue={config.gitlabReviewEnabled !== false}
                                 valuePropName="checked"
                             >

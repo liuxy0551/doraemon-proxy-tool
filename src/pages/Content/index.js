@@ -1,5 +1,6 @@
 import { isMatchedHost } from '@/utils/hostMatcher';
 import { DEFAULT_AD_BLOCK_SELECTORS } from '@/const';
+import { extractScore, isAiReviewerAuthor } from './gitlab-reviewer-core';
 
 chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, allEnvList }) {
     function isSameHostname(urlStr) {
@@ -278,15 +279,6 @@ function injectGitlabReviewer(config) {
         if (score >= 85) return 'score-good';
         if (score >= 70) return 'score-ok';
         return 'score-bad';
-    }
-
-    function extractScore(body) {
-        if (typeof body !== 'string') return null;
-        var match = body.match(/总分(?:为)?\s*[：:]?\s*(\d+)\s*分/);
-        if (!match) {
-            match = body.match(/总分\s*[\|\t ]+\s*(\d+)\s*分/);
-        }
-        return match ? parseInt(match[1], 10) : null;
     }
 
     function extractTextFromHtml(html) {
@@ -639,21 +631,18 @@ function injectGitlabReviewer(config) {
                     var notes = discussion.notes || [];
                     for (var n = 0; n < notes.length; n++) {
                         var note = notes[n];
-                        if (
-                            note.author &&
-                            (note.author.name === 'Front-Gitlab-AI-CodeReviewer' ||
-                             note.author.username === 'group_10_bot_33a8ceb162e44e0cf49bb168b87ed7da')
-                        ) {
-                            var noteBody = typeof note.body === 'string' ? note.body : '';
-                            // GitLab discussions.json 的原始 body 和页面渲染文本不完全一致，这里做多字段兜底
-                            var score = extractScoreFromNote(note);
-                            reviewerNotes.push({
-                                id: note.id,
-                                score: score,
-                                createdAt: note.created_at,
-                                body: noteBody,
-                            });
-                        }
+                        var noteBody = typeof note.body === 'string' ? note.body : '';
+                        // AI/bot 账号 + 正文含"总分"才计入，避免依赖会随项目变化的 bot username 白名单
+                        if (!isAiReviewerAuthor(note.author)) continue;
+                        // GitLab discussions.json 的原始 body 和页面渲染文本不完全一致，这里做多字段兜底
+                        var score = extractScoreFromNote(note);
+                        if (score === null) continue;
+                        reviewerNotes.push({
+                            id: note.id,
+                            score: score,
+                            createdAt: note.created_at,
+                            body: noteBody,
+                        });
                     }
                 }
 

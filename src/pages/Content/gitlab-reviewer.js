@@ -1,6 +1,15 @@
 (function () {
     'use strict';
 
+    // 无 DOM 的 Node 测试环境：加载共享核心后直接导出，跳过浏览器注入逻辑
+    if (typeof document === 'undefined' && typeof module !== 'undefined' && module.exports) {
+        module.exports = require('./gitlab-reviewer-core.js');
+        return;
+    }
+
+    // 过滤与评分逻辑统一在 gitlab-reviewer-core.js，与 Content/index.js 共用
+    var getAiReviewScore = window.GitlabReviewerCore.getAiReviewScore;
+
     // 仅在 GitLab MR 页面执行
     var mrMatch = window.location.pathname.match(/\/-\/merge_requests\/(\d+)/);
     if (!mrMatch) return;
@@ -28,14 +37,6 @@
         if (score >= 85) return 'score-good';
         if (score >= 70) return 'score-ok';
         return 'score-bad';
-    }
-
-    /**
-     * 从 Note 正文中提取总分
-     */
-    function extractScore(body) {
-        var match = body.match(/总分[：:](\d+)分/);
-        return match ? parseInt(match[1], 10) : null;
     }
 
     /**
@@ -141,13 +142,8 @@
                     var notes = discussion.notes || [];
                     for (var n = 0; n < notes.length; n++) {
                         var note = notes[n];
-                        // 检查是否是 Front-Gitlab-AI-CodeReviewer 的评论
-                        if (
-                            note.author &&
-                            (note.author.name === 'Front-Gitlab-AI-CodeReviewer' ||
-                             note.author.username === 'group_10_bot_33a8ceb162e44e0cf49bb168b87ed7da')
-                        ) {
-                            var score = extractScore(note.body);
+                        var score = getAiReviewScore(note);
+                        if (score !== null) {
                             reviewerNotes.push({
                                 id: note.id,
                                 score: score,
