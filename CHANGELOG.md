@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.2](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.1...v1.9.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* keep filled username/password and refresh captcha before re-typing in one-click input ([cebafac](https://github.com/liuxy0551/doraemon-proxy-tool/commit/cebafacad8ca5efd37bec07d1236ece6f1222607))
+* recognize all ai reviewer scores ([224c206](https://github.com/liuxy0551/doraemon-proxy-tool/commit/224c20627e00f571ba03af0693beee832c6309c2))
+* tighten default matchUrls regex to avoid unintended host matches ([e3a867b](https://github.com/liuxy0551/doraemon-proxy-tool/commit/e3a867bb11fd482e25d7bf3e0da330c12e7d64c8))
+
 ### [1.9.1](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.0...v1.9.1) (2026-08-28)
 
 
