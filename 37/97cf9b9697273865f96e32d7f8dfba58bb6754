@@ -1,0 +1,26 @@
+src/pages/Content/devops-login.js
+  s_320390d38e294f::t_683bedbff5ce0e 177,188-193
+  s_320390d38e294f::t_d93a1f038f64da 131-132
+  s_320390d38e294f::t_6b0e96d679fd1f 176,178-187,194-198
+  s_320390d38e294f::t_d29e8e259c3065 207,209,211-216
+test/devops-login-jump-url.test.js
+  s_320390d38e294f::t_dd43aa3f23cdfb 89
+  s_320390d38e294f::t_fb4a88ee24826f 105
+  s_320390d38e294f::t_6f5546bb17db0d 1-88,90-104,106-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3797cf9b9697273865f96e32d7f8dfba58bb6754",
+  "prompts": {},
+  "sessions": {
+    "s_320390d38e294f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13ae25f6-3796-4609-badb-b583e0acfaf1",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
