@@ -1,0 +1,41 @@
+src/pages/Content/index.js
+  s_1ccc53df4eaf36::t_e949736465fb11 100,207
+  s_660cf3c2498075::t_4280bc1d32f706 348
+src/pages/Content/gitlab-reviewer-core.js
+  h_0c940a947252a6 2,43
+src/pages/Content/content.styles.css
+  s_1ccc53df4eaf36::t_e949736465fb11 107
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 384-385
+  s_1ccc53df4eaf36::t_5983ea0c23aaac 537
+  s_660cf3c2498075::t_13722903f4aaa7 534
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "6e951a3c8eb14172d3260b66b40c65e03a06688a",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_1ccc53df4eaf36": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b9c5c51-772c-4ecb-8e14-f2ec95702443",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    },
+    "s_660cf3c2498075": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9bb9a688-0196-42a8-a464-617c235e8e44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": null
+    }
+  }
+}
