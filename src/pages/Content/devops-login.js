@@ -434,6 +434,15 @@
         ocrApiUrl,
         captchaExpiredRetryCount = 0
     ) {
+        // 登录前优先取输入框当前的值：输入框有值则覆盖配置值，为空则回退配置值
+        const usernameInput = document.querySelector('#username');
+        const passwordInput = document.querySelector('#password');
+        if (usernameInput && usernameInput.value) {
+            username = usernameInput.value;
+        }
+        if (passwordInput && passwordInput.value) {
+            password = passwordInput.value;
+        }
         const loginBtnText = document.querySelector(
             '#doraemon-login-btn .doraemon-text'
         );
