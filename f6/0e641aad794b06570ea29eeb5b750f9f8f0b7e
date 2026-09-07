@@ -1,0 +1,29 @@
+src/pages/Content/index.js
+  s_1ccc53df4eaf36::t_e949736465fb11 100,207
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 384-385
+  s_1ccc53df4eaf36::t_5983ea0c23aaac 537
+src/pages/Content/content.styles.css
+  s_1ccc53df4eaf36::t_e949736465fb11 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "f60e641aad794b06570ea29eeb5b750f9f8f0b7e",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  },
+  "sessions": {
+    "s_1ccc53df4eaf36": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b9c5c51-772c-4ecb-8e14-f2ec95702443",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
