@@ -1,0 +1,19 @@
+src/pages/Content/devops-login.js
+  s_f6083f750f99fb::t_8b639adff1b9a1 437-445
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "48e21c6804d576e28bcf5bbcfc192b76407a7853",
+  "prompts": {},
+  "sessions": {
+    "s_f6083f750f99fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23d91628-f833-46f3-9cb5-dbe6e6b04226",
+        "model": "deepseek-v4-flash-0731"
+      },
+      "human_author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
