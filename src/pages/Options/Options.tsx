@@ -381,8 +381,8 @@ const Options: React.FC<IProps> = () => {
                             </Form.Item>
                             <Form.Item
                                 name="devopsInjectEnabled"
-                                label="OMP注入(前端专用)"
-                                tooltip="开启后会重写本地开发环境（域名dev.或local.开头）的config文件，接管跳转地址至线上环境"
+                                label="OMP注入(前端)"
+                                tooltip="开启后会重写本地开发环境（域名dev.或local.开头）的config文件，接管跳转地址至部署环境"
                                 initialValue={config.devopsInjectEnabled}
                                 valuePropName="checked"
                             >
@@ -531,12 +531,10 @@ const Options: React.FC<IProps> = () => {
                                 }
                             </Form.Item>
                         </Card>
-                        <Card title="GitLab CodeReview" className="option-card option-card--gitlab">
+                        <Card title="GitLab MR" className="option-card option-card--gitlab">
                             <Form.Item
                                 name="gitlabReviewEnabled"
-                                label="AI CodeReview 悬浮面板"
-                                labelCol={{ span: 6 }}
-                                wrapperCol={{ span: 18 }}
+                                label="AI 评分面板"
                                 tooltip="在 GitLab MR 页面右上角展示 AI 评审账号的评论列表和评分（识别含总分内容的 ai/bot 账号评论）"
                                 initialValue={config.gitlabReviewEnabled !== false}
                                 valuePropName="checked"

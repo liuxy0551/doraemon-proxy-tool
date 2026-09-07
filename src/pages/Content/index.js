@@ -97,7 +97,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         }
     });
 
-    // 检测 GitLab MR 页面，添加 AI CodeReview 悬浮面板（内容脚本直接操作 DOM）
+    // 检测 GitLab MR 页面，添加 AI 评分面板（内容脚本直接操作 DOM）
     if (
         config?.gitlabReviewEnabled !== false &&
         location.hostname.indexOf('gitlab.') !== -1 &&
@@ -204,7 +204,7 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
 });
 
 /**
- * GitLab MR 页面 AI CodeReview 悬浮面板
+ * GitLab MR 页面 AI 评分面板
  * 内容脚本直接调用，不依赖页面级脚本注入
  */
 function extractBaseMrPath(pathname) {
@@ -345,7 +345,7 @@ function injectGitlabReviewer(config) {
             '<div class="doraemon-gitlab-header">' +
                 '<span class="doraemon-gitlab-header-title">' +
                     '<img class="doraemon-gitlab-header-logo" src="' + panelLogoUrl + '" alt="Doraemon logo" />' +
-                    '<span>AI CodeReview 列表</span>' +
+                    '<span>AI 评分列表</span>' +
                 '</span>' +
                 '<button class="doraemon-gitlab-close" title="关闭">&times;</button>' +
             '</div>' +

@@ -1,5 +1,5 @@
 /**
- * GitLab AI CodeReview 面板的纯逻辑（评分提取 + AI 作者识别）。
+ * GitLab AI 评分悬浮面板的纯逻辑（评分提取 + AI 作者识别）。
  * 由 Content/index.js（webpack contentScript 入口）和 gitlab-reviewer.js 共用，
  * 保持两处行为一致。
  */
@@ -40,7 +40,7 @@
     }
 
     /**
-     * 判断一条评论是否计入 AI CodeReview 面板：
+     * 判断一条评论是否计入 AI 评分悬浮面板：
      * AI/bot 账号 + 正文含"总分"才纳入，两者缺一不可
      */
     function getAiReviewScore(note) {
