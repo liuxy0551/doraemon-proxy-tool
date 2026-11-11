@@ -1,0 +1,24 @@
+src/pages/Options/Options.tsx
+  h_0c940a947252a6 26-28,103,142-157,172-186,189,649,656,663-812
+  h_0c940a947252a6 24-25,29,187-188,190-191,813
+src/pages/Options/Options.scss
+  h_0c940a947252a6 48,86-152
+  h_0c940a947252a6 153-172
+src/pages/Content/index.js
+  h_0c940a947252a6 1,93-167,172
+src/typings/index.d.ts
+  h_0c940a947252a6 31-39,62-63
+src/utils/hostMatcher.js
+  h_0c940a947252a6 41-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8aaf7a77e45157a081a433195d2b031f9dd37175",
+  "prompts": {},
+  "humans": {
+    "h_0c940a947252a6": {
+      "author": "liuyi <liuyi@dtstack.com>"
+    }
+  }
+}
