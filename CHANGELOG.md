@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.3](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.2...v1.9.3) (2026-11-11)
+
+
+### Features
+
+* 快速登录优先使用输入框当前值 ([48e21c6](https://github.com/liuxy0551/doraemon-proxy-tool/commit/48e21c6804d576e28bcf5bbcfc192b76407a7853))
+* 支持自定义页面注入(CSS/JS) ([8aaf7a7](https://github.com/liuxy0551/doraemon-proxy-tool/commit/8aaf7a77e45157a081a433195d2b031f9dd37175))
+
+
+### Bug Fixes
+
+* allow portal subdomain redirect ([3797cf9](https://github.com/liuxy0551/doraemon-proxy-tool/commit/3797cf9b9697273865f96e32d7f8dfba58bb6754))
+
 ### [1.9.2](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.1...v1.9.2) (2026-09-03)
 
 
