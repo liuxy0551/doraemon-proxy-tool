@@ -21,7 +21,12 @@ import {
     DEFAULT_AD_BLOCK_RULES,
     DEFAULT_AD_BLOCK_SELECTORS,
 } from '@/const';
-import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+    GithubOutlined,
+    InfoCircleOutlined,
+    DeleteOutlined,
+    PlusOutlined,
+} from '@ant-design/icons';
 import { getThemeAlgorithm } from '@/utils';
 import './Options.scss';
 
@@ -95,7 +100,7 @@ const Options: React.FC<IProps> = () => {
     const [form] = useForm();
     const sizeType = Form.useWatch(['size', 'type'], form);
 
-    const handleFormChange = (changedValues: any) => {
+    const handleFormChange = (changedValues: any, allValues?: any) => {
         if (changedValues.ip) {
             setIp(changedValues.ip);
             chrome.storage.local.set({ ip: changedValues.ip });
@@ -134,6 +139,22 @@ const Options: React.FC<IProps> = () => {
         if ('adBlockSelectors' in changedValues) {
             newConfig.adBlockSelectors = changedValues.adBlockSelectors || [];
         }
+        if ('customInjections' in changedValues) {
+            const rawInjections =
+                allValues?.customInjections ||
+                form.getFieldValue('customInjections') ||
+                [];
+            newConfig.customInjections = rawInjections.map(
+                (item: any, idx: number) => ({
+                    id: item?.id || `inj_${Date.now()}_${idx}`,
+                    name: item?.name || '',
+                    enabled: item?.enabled !== false,
+                    urlPattern: item?.urlPattern || '',
+                    type: item?.type || 'css',
+                    code: item?.code || '',
+                })
+            );
+        }
         if ('quickLogin' in changedValues) {
             newConfig.quickLogin = Object.assign(
                 {},
@@ -146,6 +167,26 @@ const Options: React.FC<IProps> = () => {
         }
         setConfig(newConfig);
         chrome.storage.local.set({ config: newConfig });
+    };
+
+    // 填入 Multica 详情容器宽度优化示例（将 max-w-4xl 扩展为 max-w-6xl）
+    const handleAddMulticaPreset = () => {
+        const list = form.getFieldValue('customInjections') || [];
+        const newRule: ICustomInjection = {
+            id: `inj_multica_${Date.now()}`,
+            name: 'Multica 任务详情页宽度优化 (max-w-6xl)',
+            enabled: true,
+            urlPattern: '*multica*',
+            type: 'css',
+            code: `/* 将 Multica 详情容器最大宽度从 max-w-4xl (56rem) 覆盖为 max-w-6xl (72rem) */\ndiv[class*="max-w-4xl"][class*="max-md:pb-chat-launcher"] {\n    max-width: 72rem !important;\n}`,
+        };
+        const nextList = [...list, newRule];
+        form.setFieldsValue({ customInjections: nextList });
+        const newConfig = cloneDeep(config) || ({} as IConfig);
+        newConfig.customInjections = nextList;
+        setConfig(newConfig);
+        chrome.storage.local.set({ config: newConfig });
+        message.success('已添加 Multica 宽度优化注入示例');
     };
 
     // 恢复广告拦截内置默认规则（清空输入框后用于一键找回）
@@ -605,19 +646,170 @@ const Options: React.FC<IProps> = () => {
                             <div className="ad-block-actions">
                                 <Button
                                     type="link"
-                                    size="small"
+                                    size="middle"
                                     onClick={() => openDomParse()}
                                 >
                                     DOM解析
                                 </Button>
                                 <Button
                                     type="link"
-                                    size="small"
+                                    size="middle"
                                     onClick={handleResetAdBlockDefaults}
                                 >
                                     恢复默认
                                 </Button>
                             </div>
+                        </Card>
+                        <Card
+                            title="自定义页面注入"
+                            className="option-card option-card--injection"
+                            extra={
+                                <Button
+                                    type="link"
+                                    size="middle"
+                                    onClick={handleAddMulticaPreset}
+                                >
+                                    Multica 示例
+                                </Button>
+                            }
+                        >
+                            <Form.List
+                                name="customInjections"
+                                initialValue={config.customInjections || []}
+                            >
+                                {(fields, { add, remove }) => (
+                                    <div className="custom-injection-container">
+                                        {fields.length === 0 && (
+                                            <div
+                                                style={{
+                                                    textAlign: 'center',
+                                                    padding: '24px 0',
+                                                    color: '#999',
+                                                    fontSize: 13,
+                                                }}
+                                            >
+                                                暂无自定义注入规则，可点击下方「添加注入规则」或上方「Multica 示例」
+                                            </div>
+                                        )}
+                                        {fields.map(({ key, name, ...restField }) => (
+                                            <Card
+                                                key={key}
+                                                className="custom-injection-card"
+                                                title={
+                                                    <div className="injection-card-title">
+                                                        <Form.Item
+                                                            {...restField}
+                                                            name={[name, 'enabled']}
+                                                            valuePropName="checked"
+                                                            initialValue={true}
+                                                            noStyle
+                                                        >
+                                                            <Switch
+                                                                checkedChildren="开"
+                                                                unCheckedChildren="关"
+                                                            />
+                                                        </Form.Item>
+                                                        <Form.Item
+                                                            {...restField}
+                                                            name={[name, 'name']}
+                                                            noStyle
+                                                        >
+                                                            <Input
+                                                                size="middle"
+                                                                placeholder="规则名称（选填）"
+                                                                style={{ width: 400 }}
+                                                            />
+                                                        </Form.Item>
+                                                        <Form.Item
+                                                            {...restField}
+                                                            name={[name, 'type']}
+                                                            initialValue="css"
+                                                            noStyle
+                                                        >
+                                                            <Radio.Group buttonStyle="solid" size="middle">
+                                                                <Radio.Button value="css">
+                                                                    CSS
+                                                                </Radio.Button>
+                                                                <Radio.Button value="js">
+                                                                    JS
+                                                                </Radio.Button>
+                                                            </Radio.Group>
+                                                        </Form.Item>
+                                                    </div>
+                                                }
+                                                extra={
+                                                    <Button
+                                                        type="text"
+                                                        danger
+                                                        size="middle"
+                                                        icon={<DeleteOutlined />}
+                                                        onClick={() => remove(name)}
+                                                    >
+                                                        删除
+                                                    </Button>
+                                                }
+                                            >
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'id']}
+                                                    hidden
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+
+                                                <div className="injection-field-row">
+                                                    <div className="field-label">生效网址：</div>
+                                                    <div className="field-control">
+                                                        <Form.Item
+                                                            {...restField}
+                                                            name={[name, 'urlPattern']}
+                                                            noStyle
+                                                        >
+                                                            <Input placeholder="支持域名包含、通配符或正则，如：example.com 或 *://*.internal.net/* 或 /multica/i" />
+                                                        </Form.Item>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    className="injection-field-row"
+                                                    style={{ marginTop: 12 }}
+                                                >
+                                                    <div className="field-label">注入代码：</div>
+                                                    <div className="field-control">
+                                                        <Form.Item
+                                                            {...restField}
+                                                            name={[name, 'code']}
+                                                            noStyle
+                                                        >
+                                                            <Input.TextArea
+                                                                rows={5}
+                                                                placeholder="请输入 CSS 样式规则或 JS 代码"
+                                                            />
+                                                        </Form.Item>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                        <Button
+                                            type="dashed"
+                                            block
+                                            icon={<PlusOutlined />}
+                                            onClick={() =>
+                                                add({
+                                                    id: `inj_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                                                    name: '',
+                                                    enabled: true,
+                                                    urlPattern: '',
+                                                    type: 'css',
+                                                    code: '',
+                                                })
+                                            }
+                                        >
+                                            添加注入规则
+                                        </Button>
+                                    </div>
+                                )}
+                            </Form.List>
                         </Card>
                     </Form>
                 )}

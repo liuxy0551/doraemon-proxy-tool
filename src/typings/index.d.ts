@@ -28,6 +28,15 @@ interface IFetchResponse<T = any> {
     data: T;
 }
 
+interface ICustomInjection {
+    id: string;
+    name?: string;
+    enabled: boolean;
+    urlPattern: string;
+    type: 'css' | 'js';
+    code: string;
+}
+
 interface IConfig {
     ipGetMode: 'auto' | 'fixed';
     size: { type: any; width: number | null; height: number | null };
@@ -50,6 +59,8 @@ interface IConfig {
     adBlockRules: string[];
     /** 自定义页面广告元素选择器（CSS selector，每行一条） */
     adBlockSelectors: string[];
+    /** 自定义页面注入列表（CSS / JS，根据网址匹配一组一组注入） */
+    customInjections?: ICustomInjection[];
 }
 
 interface IStorageCache {

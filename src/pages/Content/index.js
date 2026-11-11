@@ -1,4 +1,4 @@
-import { isMatchedHost } from '@/utils/hostMatcher';
+import { isMatchedHost, isUrlMatched } from '@/utils/hostMatcher';
 import { DEFAULT_AD_BLOCK_SELECTORS } from '@/const';
 import { extractScore, isAiReviewerAuthor } from './gitlab-reviewer-core';
 
@@ -90,10 +90,86 @@ chrome.storage.local.get({ config: {}, allEnvList: [] }, function ({ config, all
         }
     };
     syncAdBlock(config?.adBlockSelectors);
+
+    /**
+     * 自定义页面注入管理：支持按 URL 匹配一组一组注入 CSS 或 JS 脚本
+     * 在 DOM 开始时即时生效，并在配置变化时支持热更新
+     */
+    const injectionNodesMap = new Map();
+
+    const applyCustomInjections = (injections = []) => {
+        // 先清理已不再匹配或已禁用的旧注入节点
+        const currentActiveIds = new Set();
+        const currentUrl = location.href;
+        const currentHostname = location.hostname;
+
+        injections.forEach((item, index) => {
+            const itemId = item.id || `custom-inj-${index}`;
+            const isEnabled = item.enabled !== false;
+            const isMatched =
+                isEnabled &&
+                isUrlMatched(item.urlPattern, currentUrl, currentHostname);
+
+            if (!isMatched || !item.code?.trim()) {
+                // 如果未匹配或代码为空，且之前已挂载过，则予以移除
+                if (injectionNodesMap.has(itemId)) {
+                    injectionNodesMap.get(itemId)?.remove?.();
+                    injectionNodesMap.delete(itemId);
+                }
+                return;
+            }
+
+            currentActiveIds.add(itemId);
+
+            if (item.type === 'css') {
+                let styleEl = injectionNodesMap.get(itemId);
+                if (!styleEl || !document.contains(styleEl)) {
+                    styleEl = document.createElement('style');
+                    styleEl.setAttribute('data-doraemon-injection-id', itemId);
+                    document.documentElement.appendChild(styleEl);
+                    injectionNodesMap.set(itemId, styleEl);
+                }
+                if (styleEl.textContent !== item.code) {
+                    styleEl.textContent = item.code;
+                }
+            } else if (item.type === 'js') {
+                // JS 脚本：如果已注入过且代码未变则不重复注入，否则重新创建 script 标签插入
+                const existing = injectionNodesMap.get(itemId);
+                if (existing && existing.dataset?.codeHash === item.code) {
+                    return;
+                }
+                if (existing) {
+                    existing.remove?.();
+                }
+                try {
+                    const scriptEl = document.createElement('script');
+                    scriptEl.setAttribute('data-doraemon-injection-id', itemId);
+                    scriptEl.dataset.codeHash = item.code;
+                    scriptEl.textContent = item.code;
+                    document.documentElement.appendChild(scriptEl);
+                    injectionNodesMap.set(itemId, scriptEl);
+                } catch (e) {
+                    console.error('[Doraemon] 自定义 JS 注入失败:', e);
+                }
+            }
+        });
+
+        // 移除已经不存在于最新配置里的注入节点
+        injectionNodesMap.forEach((node, id) => {
+            if (!currentActiveIds.has(id)) {
+                node?.remove?.();
+                injectionNodesMap.delete(id);
+            }
+        });
+    };
+
+    applyCustomInjections(config?.customInjections);
+
     chrome.storage.onChanged.addListener((changes, areaName) => {
         if (areaName !== 'local') return;
         if (changes.config?.newValue) {
             syncAdBlock(changes.config.newValue.adBlockSelectors);
+            applyCustomInjections(changes.config.newValue.customInjections);
         }
     });
 

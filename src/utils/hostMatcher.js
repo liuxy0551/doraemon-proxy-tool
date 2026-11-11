@@ -38,3 +38,49 @@ export function isMatchedHost(matchUrls, hostname) {
 export function isIpAddress(hostname) {
     return /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
 }
+
+/**
+ * 判断当前页面 URL 或主机名是否匹配配置的规则（支持普通包含、通配符 * 以及 /regex/ 正则）
+ * @param {string} pattern - 匹配规则
+ * @param {string} currentUrl - 当前完整页面地址（如 location.href）
+ * @param {string} currentHostname - 当前主机名（如 location.hostname）
+ * @returns {boolean}
+ */
+export function isUrlMatched(pattern, currentUrl = '', currentHostname = '') {
+    const rawPattern = pattern?.trim?.() || '';
+    if (!rawPattern) return false;
+
+    // 正则形式：以斜杠包裹，例如 /example\.com\/path/i
+    if (rawPattern.startsWith('/') && rawPattern.lastIndexOf('/') > 0) {
+        const lastSlashIndex = rawPattern.lastIndexOf('/');
+        const body = rawPattern.slice(1, lastSlashIndex);
+        const flags = rawPattern.slice(lastSlashIndex + 1);
+        try {
+            const regex = new RegExp(body, flags);
+            return regex.test(currentUrl) || regex.test(currentHostname);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // 通配符形式：包含星号 *
+    if (rawPattern.includes('*')) {
+        try {
+            // 转义正则特殊字符并把通配符 * 转换为 .*
+            const escaped = rawPattern
+                .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+                .replace(/\*/g, '.*');
+            const regex = new RegExp(`^${escaped}$`, 'i');
+            return regex.test(currentUrl) || regex.test(currentHostname);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // 普通字符串形式：完整包含或主机名一致
+    return (
+        currentUrl.includes(rawPattern) ||
+        currentHostname === rawPattern
+    );
+}
+
