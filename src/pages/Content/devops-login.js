@@ -314,6 +314,35 @@
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
+    function getUsernameInput() {
+        const selectors = [
+            '#username',
+            'input[name="username"]',
+            'input[placeholder*="账号"]',
+            'input[placeholder*="用户名"]',
+            '.c-login__container__form input[type="text"]',
+        ];
+        for (const sel of selectors) {
+            const el = document.querySelector(sel);
+            if (el) return el;
+        }
+        return null;
+    }
+
+    function getPasswordInput() {
+        const selectors = [
+            '#password',
+            'input[type="password"]',
+            'input[name="password"]',
+            'input[placeholder*="密码"]',
+        ];
+        for (const sel of selectors) {
+            const el = document.querySelector(sel);
+            if (el) return el;
+        }
+        return null;
+    }
+
     function getCaptchaInput() {
         return document.querySelector(CAPTCHA_INPUT_SELECTOR);
     }
@@ -389,6 +418,19 @@
         });
     }
 
+    // 检查页面当前是否展示验证码输入框
+    function hasCaptcha() {
+        const captchaInput = getCaptchaInput();
+        if (!captchaInput) return false;
+        if (typeof window !== 'undefined' && typeof window.getComputedStyle === 'function') {
+            const style = window.getComputedStyle(captchaInput);
+            if (style.display === 'none' || style.visibility === 'hidden') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     async function recognizeCaptchaCode(ocrApiUrl) {
         if (!String(ocrApiUrl || '').trim()) {
             return { code: '1', key: '' };
@@ -435,8 +477,8 @@
         captchaExpiredRetryCount = 0
     ) {
         // 登录前优先取输入框当前的值：输入框有值则覆盖配置值，为空则回退配置值
-        const usernameInput = document.querySelector('#username');
-        const passwordInput = document.querySelector('#password');
+        const usernameInput = getUsernameInput();
+        const passwordInput = getPasswordInput();
         if (usernameInput && usernameInput.value) {
             username = usernameInput.value;
         }
@@ -446,9 +488,17 @@
         const loginBtnText = document.querySelector(
             '#doraemon-login-btn .doraemon-text'
         );
-        loginBtnText.innerText = '识别中...';
-        const { code: verifyCode, key: captchaKey } =
-            await recognizeCaptchaCode(ocrApiUrl);
+        let verifyCode = '';
+        let captchaKey = '';
+
+        // 仅在页面展示验证码输入框时才调用 OCR 识别
+        if (hasCaptcha()) {
+            loginBtnText.innerText = '识别中...';
+            const captchaResult = await recognizeCaptchaCode(ocrApiUrl);
+            verifyCode = captchaResult.code;
+            captchaKey = captchaResult.key;
+        }
+
         loginBtnText.innerText = '登录中...';
         const publicKey = await getPulicKey().catch(() => {
             loginBtnText.innerText = '快速登录';
@@ -461,8 +511,8 @@
         const params = {
             username,
             password: encryptPwd,
-            verify_code: verifyCode,
         };
+        if (verifyCode) params.verify_code = verifyCode;
         if (captchaKey) params.key = captchaKey;
         if (tenantId) params.tenantId = tenantId;
         const formData = new URLSearchParams();
@@ -510,10 +560,10 @@
                 }
 
                 if (!res.success) {
-                    showToast(
-                        '快速登录失败, 请检查用户名、密码、验证码，错误信息：' +
-                            res.message
-                    );
+                    const failPrefix = hasCaptcha()
+                        ? '快速登录失败, 请检查用户名、密码、验证码，错误信息：'
+                        : '快速登录失败, 请检查用户名、密码，错误信息：';
+                    showToast(failPrefix + res.message);
                     return;
                 }
                 window.location.href = jumpUrl;
@@ -523,10 +573,174 @@
             });
     }
 
+    // 模拟完整点击序列，确保兼容仅监听 mousedown/pointerdown 的下拉组件
+    function triggerClick(el) {
+        if (!el) return;
+        el.focus?.();
+        const eventOptions = { bubbles: true, cancelable: true, view: window };
+        try {
+            el.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
+        } catch (e) {
+            // 忽略不支持 PointerEvent 的环境
+        }
+        el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+        el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+        el.click();
+    }
+
+    // 寻找登录方式切换下拉框（不依赖特定第三方名称，纯通用结构定位）
+    function findModeTrigger() {
+        // 1. 优先通过常见下拉选择器匹配
+        const triggerSelectors = [
+            '.c-login__container__form .ant-select-selector',
+            '.c-login__container__form .ant-select',
+            '.c-login__container__form [role="combobox"]',
+            '.c-login__container__form [class*="select-selector"]',
+            '.c-login__container__form [class*="select"]',
+            '.c-login__container .ant-select-selector',
+            '.c-login__container .ant-select',
+            '.c-login__container [role="combobox"]',
+            '.c-login__container [class*="select"]',
+            '.ant-select-selector',
+            '.ant-select',
+            '[role="combobox"]',
+        ];
+        for (const sel of triggerSelectors) {
+            const el = document.querySelector(sel);
+            if (el && el.getBoundingClientRect().height > 0) return el;
+        }
+
+        // 2. 查找带下拉箭头（down arrow）的输入/选择容器
+        const arrowEl = document.querySelector(
+            '.ant-select-arrow, [class*="arrow"], [class*="down"], svg[data-icon="down"]'
+        );
+        if (arrowEl) {
+            const container =
+                arrowEl.closest('.ant-select-selector') ||
+                arrowEl.closest('.ant-select') ||
+                arrowEl.closest('[class*="select"]') ||
+                arrowEl.parentElement;
+            if (container) return container;
+        }
+
+        // 3. 通过登录按钮定位：取登录按钮上方的交互兄弟节点
+        const btn = document.querySelector('.c-login__container__form__btn');
+        if (btn?.parentElement) {
+            const siblings = Array.from(btn.parentElement.children);
+            const btnIndex = siblings.indexOf(btn);
+            for (let i = btnIndex - 1; i >= 0; i--) {
+                const sibling = siblings[i];
+                // 排除纯标题或提示
+                if (
+                    sibling.tagName === 'H1' ||
+                    sibling.tagName === 'H2' ||
+                    sibling.tagName === 'H3' ||
+                    sibling.classList.contains('title')
+                ) {
+                    continue;
+                }
+                const rect = sibling.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    return sibling;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // 轮询等待并在弹出层中点击固定的 UIC 账号登录选项
+    async function waitAndClickUicOption(timeoutMs = 2000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeoutMs) {
+            const allElements = Array.from(document.querySelectorAll('*'));
+            for (let i = allElements.length - 1; i >= 0; i--) {
+                const el = allElements[i];
+                const text = (el.innerText || el.textContent || '').replace(/\s+/g, '');
+                // 选项名称为固定的「UIC账号登录」
+                if (text === 'UIC账号登录' || (text.includes('UIC') && text.includes('账号登录'))) {
+                    let target = el;
+                    while (
+                        target.firstElementChild &&
+                        (target.firstElementChild.innerText || target.firstElementChild.textContent || '').replace(/\s+/g, '') === text
+                    ) {
+                        target = target.firstElementChild;
+                    }
+                    const rect = target.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        triggerClick(target);
+                        // 同时尝试派发事件至所属的 li/option 容器
+                        const optionItem =
+                            target.closest('.ant-select-item-option') ||
+                            target.closest('li') ||
+                            target.closest('[role="option"]');
+                        if (optionItem && optionItem !== target) {
+                            triggerClick(optionItem);
+                        }
+                        return true;
+                    }
+                }
+            }
+            await sleep(80);
+        }
+        return false;
+    }
+
+    // 自动选中 UIC 账号登录方式：若当前不是 UIC 账号表单，则点开下拉框并选中「UIC账号登录」
+    async function ensureUicLoginMode() {
+        // 已有账号输入框，说明当前就是 UIC 账号登录模式，无需切换
+        if (getUsernameInput()) return;
+
+        // 检查页面是否已经直接露出了 UIC 账号登录选项（如已展开）
+        let clicked = await waitAndClickUicOption(100);
+
+        if (!clicked) {
+            // 找登录方式下拉框触发区域
+            const trigger = findModeTrigger();
+            if (trigger) {
+                triggerClick(trigger);
+                // 兼容内部 selector 或 input 的点击事件
+                const inner =
+                    trigger.querySelector('.ant-select-selector') ||
+                    trigger.querySelector('input') ||
+                    trigger.querySelector('.ant-select-arrow');
+                if (inner && inner !== trigger) {
+                    triggerClick(inner);
+                }
+                clicked = await waitAndClickUicOption(800);
+
+                // 若尚未弹出，对触发区域进行一次重试点击
+                if (!clicked) {
+                    triggerClick(trigger);
+                    clicked = await waitAndClickUicOption(1500);
+                }
+            }
+        }
+
+        // 等待账号输入框出现（最多等 3 秒）
+        await new Promise((resolve) => {
+            if (getUsernameInput()) {
+                resolve(true);
+                return;
+            }
+            const maxWait = 3000;
+            const interval = 100;
+            let elapsed = 0;
+            const timer = setInterval(() => {
+                elapsed += interval;
+                if (getUsernameInput() || elapsed >= maxWait) {
+                    clearInterval(timer);
+                    resolve(true);
+                }
+            }, interval);
+        });
+        // 延时等待表单字段和状态稳定渲染
+        await sleep(200);
+    }
+
     async function typePassword(username, password, ocrApiUrl) {
-        var usernameInput = document.querySelector('#username');
-        var passwordInput = document.querySelector('#password');
-        var captchaInput = getCaptchaInput();
+        var usernameInput = getUsernameInput();
+        var passwordInput = getPasswordInput();
 
         if (!usernameInput || !passwordInput) {
             showToast('输入失败, 未找到账号或密码输入框');
@@ -541,15 +755,19 @@
             simulate(passwordInput, password);
         }
 
-        if (captchaInput) {
-            // 输入框已有验证码时先刷新，避免旧图对应的验证码已失效
-            if (captchaInput.value) {
-                const captchaImage = getCaptchaImage();
-                captchaImage?.click();
-                await sleep(500);
+        // 仅在页面展示验证码时才进行识别和填入
+        if (hasCaptcha()) {
+            const captchaInput = getCaptchaInput();
+            if (captchaInput) {
+                // 输入框已有验证码时先刷新，避免旧图对应的验证码已失效
+                if (captchaInput.value) {
+                    const captchaImage = getCaptchaImage();
+                    captchaImage?.click();
+                    await sleep(500);
+                }
+                const { code } = await recognizeCaptchaCode(ocrApiUrl);
+                simulate(captchaInput, code);
             }
-            const { code } = await recognizeCaptchaCode(ocrApiUrl);
-            simulate(captchaInput, code);
         }
     }
 
@@ -618,6 +836,7 @@
                     ? decodeURIComponent(urlParams.insightRedirectUrl)
                     : configUrl.toString();
 
+            await ensureUicLoginMode();
             await execQuickLogin(
                 username,
                 password,
@@ -638,6 +857,7 @@
                 );
                 return;
             }
+            await ensureUicLoginMode();
             await typePassword(username, password, ocrApiUrl);
         });
 
