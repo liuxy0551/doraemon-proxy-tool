@@ -49,6 +49,32 @@ const toTextAreaValue = (value: any): string =>
 const resolveListValue = (value: any, fallback: any[]): any[] =>
     value === undefined || value === null ? fallback : value;
 
+// 复制文本到剪贴板工具函数（优先使用 navigator.clipboard）
+const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+        if (navigator?.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+    } catch (e) {
+        // clipboard API 失败时回退到 execCommand
+    }
+    try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return success;
+    } catch (e) {
+        return false;
+    }
+};
+
 // ---------- 广告元素 DOM 解析 ----------
 
 // 根据根元素特征生成 CSS 选择器建议（id 或 class 组合）
@@ -99,6 +125,10 @@ const Options: React.FC<IProps> = () => {
     const [config, setConfig] = useState<IConfig>();
     const [form] = useForm();
     const sizeType = Form.useWatch(['size', 'type'], form);
+    const [exportJson, setExportJson] = useState<string | null>(null);
+    const [importModalOpen, setImportModalOpen] = useState(false);
+    const [importText, setImportText] = useState('');
+    const [importMode, setImportMode] = useState<'append' | 'replace'>('append');
 
     const handleFormChange = (changedValues: any, allValues?: any) => {
         if (changedValues.ip) {
@@ -169,16 +199,16 @@ const Options: React.FC<IProps> = () => {
         chrome.storage.local.set({ config: newConfig });
     };
 
-    // 填入 Multica 详情容器宽度优化示例（将 max-w-4xl 扩展为 max-w-6xl）
+    // 填入 Multica 容器宽度优化示例（单条规则包含详情页与 760px 容器）
     const handleAddMulticaPreset = () => {
         const list = form.getFieldValue('customInjections') || [];
         const newRule: ICustomInjection = {
             id: `inj_multica_${Date.now()}`,
-            name: 'Multica 任务详情页宽度优化 (max-w-6xl)',
+            name: 'Multica 页面宽度优化 (72rem)',
             enabled: true,
             urlPattern: '*multica*',
             type: 'css',
-            code: `/* 将 Multica 详情容器最大宽度从 max-w-4xl (56rem) 覆盖为 max-w-6xl (72rem) */\ndiv[class*="max-w-4xl"][class*="max-md:pb-chat-launcher"] {\n    max-width: 72rem !important;\n}`,
+            code: `/* 将 Multica 详情容器最大宽度从 max-w-4xl (56rem) 覆盖为 max-w-6xl (72rem) */\ndiv[class*="max-w-4xl"][class*="max-md:pb-chat-launcher"] {\n    max-width: 72rem !important;\n}\n\n/* 将 Multica 容器最大宽度从 max-w-[760px] 覆盖为 72rem */\ndiv[class*="max-w-[760px]"] {\n    max-width: 72rem !important;\n}`,
         };
         const nextList = [...list, newRule];
         form.setFieldsValue({ customInjections: nextList });
@@ -187,6 +217,79 @@ const Options: React.FC<IProps> = () => {
         setConfig(newConfig);
         chrome.storage.local.set({ config: newConfig });
         message.success('已添加 Multica 宽度优化注入示例');
+    };
+
+    // 导出自定义注入规则为 JSON 并自动复制到剪贴板
+    const handleExportInjections = async () => {
+        const rawList =
+            form.getFieldValue('customInjections') ||
+            config?.customInjections ||
+            [];
+        if (!rawList.length) {
+            message.warning('当前暂无自定义注入规则可导出');
+            return;
+        }
+        const jsonStr = JSON.stringify(rawList, null, 2);
+        setExportJson(jsonStr);
+        await copyToClipboard(jsonStr);
+        message.success('已自动复制到剪贴板');
+    };
+
+    // 打开导入弹窗
+    const handleOpenImportModal = () => {
+        setImportText('');
+        setImportMode('append');
+        setImportModalOpen(true);
+    };
+
+    // 确认执行导入自定义注入规则
+    const handleConfirmImport = () => {
+        if (!importText.trim()) {
+            message.warning('请先输入或选择要导入的 JSON 内容');
+            return;
+        }
+        try {
+            const parsed = JSON.parse(importText);
+            const rawArray = Array.isArray(parsed)
+                ? parsed
+                : Array.isArray(parsed?.customInjections)
+                ? parsed.customInjections
+                : null;
+
+            if (!rawArray || !rawArray.length) {
+                message.error('未在内容中找到有效的注入规则');
+                return;
+            }
+
+            const importedRules: ICustomInjection[] = rawArray.map(
+                (item: any, idx: number) => ({
+                    id: item?.id || `inj_${Date.now()}_${idx}`,
+                    name: item?.name || '',
+                    enabled: item?.enabled !== false,
+                    urlPattern: item?.urlPattern || '',
+                    type: item?.type === 'js' ? 'js' : 'css',
+                    code: item?.code || '',
+                })
+            );
+
+            const currentList = form.getFieldValue('customInjections') || [];
+            const nextList =
+                importMode === 'replace'
+                    ? importedRules
+                    : [...currentList, ...importedRules];
+
+            form.setFieldsValue({ customInjections: nextList });
+            const newConfig = cloneDeep(config) || ({} as IConfig);
+            newConfig.customInjections = nextList;
+            setConfig(newConfig);
+            chrome.storage.local.set({ config: newConfig });
+            setImportModalOpen(false);
+            message.success(
+                `成功导入 ${importedRules.length} 条规则，当前共 ${nextList.length} 条规则`
+            );
+        } catch (e) {
+            message.error('JSON 解析失败，请检查格式');
+        }
     };
 
     // 恢复广告拦截内置默认规则（清空输入框后用于一键找回）
@@ -664,13 +767,29 @@ const Options: React.FC<IProps> = () => {
                             title="自定义页面注入"
                             className="option-card option-card--injection"
                             extra={
-                                <Button
-                                    type="link"
-                                    size="middle"
-                                    onClick={handleAddMulticaPreset}
-                                >
-                                    Multica 示例
-                                </Button>
+                                <div className="custom-injection-actions">
+                                    <Button
+                                        type="link"
+                                        size="middle"
+                                        onClick={handleExportInjections}
+                                    >
+                                        导出
+                                    </Button>
+                                    <Button
+                                        type="link"
+                                        size="middle"
+                                        onClick={handleOpenImportModal}
+                                    >
+                                        导入
+                                    </Button>
+                                    <Button
+                                        type="link"
+                                        size="middle"
+                                        onClick={handleAddMulticaPreset}
+                                    >
+                                        Multica 示例
+                                    </Button>
+                                </div>
                             }
                         >
                             <Form.List
@@ -884,6 +1003,97 @@ const Options: React.FC<IProps> = () => {
                     {!discoveredHosts.length && !suggestedSelector && (
                         <div style={{ marginTop: 12, color: '#999' }}>
                             未识别到外部资源域名与元素特征，可手动在下方输入选择器
+                        </div>
+                    )}
+                </Modal>
+
+                <Modal
+                    title="导出自定义注入规则"
+                    open={!!exportJson}
+                    onCancel={() => setExportJson(null)}
+                    footer={[
+                        <Button
+                            key="copy"
+                            onClick={async () => {
+                                if (exportJson) {
+                                    await copyToClipboard(exportJson);
+                                    message.success('已复制到剪贴板');
+                                }
+                            }}
+                        >
+                            复制内容
+                        </Button>,
+                        <Button
+                            key="close"
+                            type="primary"
+                            onClick={() => setExportJson(null)}
+                        >
+                            关闭
+                        </Button>,
+                    ]}
+                    width={640}
+                >
+                    <div
+                        style={{
+                            marginBottom: 8,
+                            color: '#52c41a',
+                            fontSize: 13,
+                        }}
+                    >
+                        已自动复制到剪贴板，可直接粘贴分享或保存
+                    </div>
+                    <Input.TextArea
+                        value={exportJson || ''}
+                        rows={12}
+                        readOnly
+                        style={{
+                            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                            fontSize: 12,
+                        }}
+                    />
+                </Modal>
+
+                <Modal
+                    title="导入自定义注入规则"
+                    open={importModalOpen}
+                    onCancel={() => setImportModalOpen(false)}
+                    onOk={handleConfirmImport}
+                    okText="确认导入"
+                    cancelText="取消"
+                    width={640}
+                >
+                    <div
+                        style={{
+                            marginBottom: 8,
+                            color: '#888',
+                            fontSize: 12,
+                        }}
+                    >
+                        请粘贴自定义注入规则的 JSON 代码：
+                    </div>
+                    <Input.TextArea
+                        rows={10}
+                        value={importText}
+                        onChange={(e) => setImportText(e.target.value)}
+                        placeholder="请在此粘贴自定义注入规则的 JSON 格式数据"
+                        style={{
+                            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                            fontSize: 12,
+                            marginBottom: 12,
+                        }}
+                    />
+                    {(form.getFieldValue('customInjections') || []).length > 0 && (
+                        <div>
+                            <span style={{ marginRight: 12, fontSize: 13 }}>
+                                导入方式：
+                            </span>
+                            <Radio.Group
+                                value={importMode}
+                                onChange={(e) => setImportMode(e.target.value)}
+                            >
+                                <Radio value="append">追加到现有规则</Radio>
+                                <Radio value="replace">覆盖现有规则</Radio>
+                            </Radio.Group>
                         </div>
                     )}
                 </Modal>

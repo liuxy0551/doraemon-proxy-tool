@@ -172,7 +172,8 @@ header {
     }
 }
 
-.ad-block-actions {
+.ad-block-actions,
+.custom-injection-actions {
     display: flex;
     gap: 8px;
 }
