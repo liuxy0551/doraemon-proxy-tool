@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.5](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.4...v1.9.5) (2026-11-13)
+
+
+### Features
+
+* 支持自定义页面注入规则导出与导入 ([5e299c9](https://github.com/liuxy0551/doraemon-proxy-tool/commit/5e299c9a7cd936cddf3240f0e871f3939f9db023))
+
 ### [1.9.4](https://github.com/liuxy0551/doraemon-proxy-tool/compare/v1.9.3...v1.9.4) (2026-11-12)
 
 
